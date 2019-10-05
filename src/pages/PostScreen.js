@@ -5,32 +5,95 @@ import {
   ScrollView,
   Text,
   StyleSheet,
-  Dimensions
+  Dimensions,
+  Image
 } from "react-native";
 import styled from "styled-components";
-import HTML from "react-native-render-html";
-import HTMLView from "react-native-htmlview";
+import { formatDate } from "../utils/Utils";
+import { WebView } from "react-native-webview";
+import AutoHeightWebView from "react-native-autoheight-webview";
+import MyWebView from "react-native-webview-autoheight";
+const customStyle =
+  "<style>* {max-width: 100%;} body {font-family: sans-serif;} img {height: auto !important} </style>";
 
 const styles = StyleSheet.create({
   a: {
     fontWeight: "300",
-    color: "#FF3366" // make links coloured pink
+    color: "#FF3366"
+  },
+  p: {
+    margin: 0,
+    padding: 0
+  },
+  img: {
+    margin: 0
   }
 });
 
 const variables = {
   colors: {
-    primary: "orange",
-    text: "black"
+    primary: "#f25529",
+    text: "#000",
+    textSecondary: "#888888"
   }
 };
 
-const FeaturedImage = styled(View)`
+const FeaturedImageArea = styled(View)`
   width: 100%;
   height: 200;
 `;
+
+const FeaturedImage = ({ id }) => {
+  const [hasError, setErrors] = useState(false);
+  const [img, setImg] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchData() {
+    const res = await fetch(
+      `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
+    );
+    res
+      .json()
+      .then(res => {
+        setImg(res);
+        setLoading(false);
+      })
+      .catch(err => setErrors(err));
+  }
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (loading || img === null) {
+    return (
+      <View
+        style={{ width: "100%", height: "100%", backgroundColor: "#E8E8E8" }}
+      ></View>
+    );
+  }
+
+  return (
+    <ImageBackground
+      style={{ width: "100%", height: "100%" }}
+      source={{
+        uri: img.media_details.sizes.medium_large.source_url
+      }}
+    ></ImageBackground>
+  );
+};
+
+const Date = ({ date }) => {
+  return (
+    <Text style={{ color: variables.colors.textSecondary }}>
+      {formatDate(date)}
+    </Text>
+  );
+};
 const Content = styled(View)`
-  padding: 3% 4% 20% 4%;
+  padding: 15px;
+  flex: 1;
+  flex-direction: column;
 `;
 
 const Category = styled(Text)`
@@ -61,33 +124,29 @@ const Title = props => {
   );
 };
 
-const PostScreen = (props) => {
+const PostScreen = props => {
   const { navigation } = props;
-  console.log(props);
   const { post } = navigation.state.params;
 
   if (post === null) {
     return <Text>Loading...</Text>;
   }
 
+  console.log(post.content.rendered);
   return (
     <ScrollView style={{ flex: 1, paddingBottom: 20 }}>
-      <FeaturedImage>
-        <ImageBackground
-          style={{ width: "100%", height: "100%" }}
-          source={{
-            uri:
-              "https://images.unsplash.com/photo-1557528790-57703e26314d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2100&q=80"
-          }}
-        ></ImageBackground>
-      </FeaturedImage>
-
+      <FeaturedImageArea>
+        <FeaturedImage key={post.id} id={post.featured_media}></FeaturedImage>
+      </FeaturedImageArea>
       <Content>
         <Title size={1}>{post.title.rendered}</Title>
         <Category>Categories...</Category>
+        <Date date={post.date}></Date>
 
-        <Text style={{ marginBottom: 5 }}>{post.date}</Text>
-        <HTMLView value={post.content.rendered} stylesheet={styles} />
+        <MyWebView
+          source={{ html: customStyle + post.content.rendered }}
+          width={Dimensions.get("window").width - 30}
+        />
       </Content>
     </ScrollView>
   );
