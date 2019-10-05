@@ -1,11 +1,10 @@
 import { Animated, TouchableOpacity, View, Text, TouchableHighlight } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styled from 'styled-components';
-import React, { useEffect } from 'react';
-
-import { Layout } from '../../utils';
+import React, { useState } from 'react';
 
 import Social from './Social';
+import Search from './Search';
 
 const Container = styled.View`
   height: 50px;
@@ -17,56 +16,38 @@ const Container = styled.View`
   background: #000000;
 `;
 
-const ICON_POSITION = (Layout.window.width / 2) - 46.5;
-
 const Header = (props) => {
-  const { openDrawer, navigation } = props;
+  const { navigation } = props;
+  const { openDrawer } = navigation;
 
-  const _animatedOpacity = new Animated.Value(1);
+  const [isSearching, setIsSearching] = useState(false);
 
-  useEffect(() => {
-    if (navigation.state.drawerMovementDirection === 'opening') {
-      Animated.parallel([
-        Animated.timing(
-          _animatedOpacity,
-          {
-            toValue: 0,
-            duration: 150,
-          },
-        )
-      ]).start()
-    }
+  const openSearch = () => setIsSearching(true);
+  const closeSearch = () => setIsSearching(false);
+  const handleSearch = (search) => {
+    console.log(search);
+    closeSearch();
+  }
 
-    if (navigation.state.drawerMovementDirection === 'closing') {
-      Animated.parallel([
-        Animated.timing(
-          _animatedOpacity,
-          {
-            toValue: 1,
-            duration: 150,
-          },
-        )
-      ]).start()
-    }
-  }, [navigation.state.drawerMovementDirection])
+  if (isSearching) {
+    return (
+      <Container>
+        <Search onSearch={handleSearch} />
+      </Container>
+    );
+  }
 
   return (
     <Container>
-      <Animated.View style={{ opacity: _animatedOpacity }}>
-        <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
-          <Ionicons name="md-menu" size={35} color="white" />
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
+        <Ionicons name="md-menu" size={35} color="white" />
+      </TouchableOpacity>
 
-      <Animated.View style={{ opacity: _animatedOpacity }}>
-        <Social />
-      </Animated.View>
+      <Social />
 
-      <Animated.View style={{ opacity: _animatedOpacity }}>
-        <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
-          <Ionicons name="ios-search" size={30} color="white" />
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openSearch}>
+        <Ionicons name="ios-search" size={30} color="white" />
+      </TouchableOpacity>
     </Container>
   );
 };
