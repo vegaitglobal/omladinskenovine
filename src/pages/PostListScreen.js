@@ -65,7 +65,7 @@ const PostTitle = styled.Text`
     font-size: 25px;
 `;
 
-const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl }) => {
+const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl, handleOnPress }) => {
   const [categories, setCategories] = useState("");
 
   const formattedTitle = rendered
@@ -77,7 +77,7 @@ const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl
   }, []);
 
   return (
-    <SinglePostWrapper>
+    <SinglePostWrapper onPress={handleOnPress}>
       <BackgroundImage resizeMode="contain" source={{uri: imageUrl}} />
       <Overlay>
         <PostDetails>
@@ -101,8 +101,7 @@ const PostListScreen = (props) => {
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
   const [posts, setPosts] = useState([]);
 
-  console.log(navigation.state.params)
-
+  const handleOnPress = (post) => navigation.push('Post', {post});
   useEffect(() => {
     fetchPostsWithImages(url).then(setPosts);
   }, [navigation.state.params]);
@@ -111,7 +110,7 @@ const PostListScreen = (props) => {
 
   return (
     <View style={{ height: '100%' }}>
-      <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} />} />
+      <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} handleOnPress={() => handleOnPress(post)}/>} />
     </View>
   )
   
