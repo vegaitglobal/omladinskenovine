@@ -1,7 +1,8 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
+import { NavigationActions } from 'react-navigation';
 
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 const Container = styled.ScrollView`
   background: #000000;
@@ -43,7 +44,10 @@ const menu = [
     children: [
       { label: "USPESNI MLADI" },
       { label: "O NAME" },
-      { label: "KONTAKT" },
+      {
+        label: "KONTAKT",
+        screen: "Contact"
+      },
     ],
   },
   {
@@ -60,18 +64,21 @@ const menu = [
 ]
 
 const renderMenu = (menuItem) => (
-  <MenuItem>
-    <MenuItem.Wrapper>
-      <MenuItem.Underline underline={!!menuItem.children}>
-        <MenuItem.Text>
-          {menuItem.label}
-        </MenuItem.Text>
-      </MenuItem.Underline>
-    </MenuItem.Wrapper>
+  <TouchableOpacity onPress={() => NavigationActions.navigate(`${menuItem.screen}`)}>
+    <MenuItem>
+      <MenuItem.Wrapper>
+        <MenuItem.Underline underline={!!menuItem.children}>
+          <MenuItem.Text>
+            {menuItem.label}
+          </MenuItem.Text>
+        </MenuItem.Underline>
+      </MenuItem.Wrapper>
 
-    {menuItem.children && menuItem.children.map(renderMenu)}
-  </MenuItem>
+      {menuItem.children && menuItem.children.map(renderMenu)}
+    </MenuItem>
+  </TouchableOpacity>
 );
+
 
 const Drawer = (props) => {
   const { items, navigation } = props;
