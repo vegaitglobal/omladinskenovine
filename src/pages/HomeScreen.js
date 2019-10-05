@@ -4,6 +4,12 @@ import Carousel from "react-native-snap-carousel";
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
 import PostThumbnail from "../components/PostThumbnail";
 
+const CATEGORY_ITEMS = [
+  { label: 'ШКОЛСКИ КУТАК', value: 4 },
+  { label: 'БЛОГ', value: 1 },
+  { label: 'КУЛТУРА', value: 8 },
+]
+
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -72,14 +78,18 @@ export default class HomeScreen extends Component {
   }
 
   renderItem({ item, index }) {
+    const { navigation } = this.props;
+
     let categories = this.state.categories.filter(cat =>
       item.categories.includes(cat.id)
     );
-    //categories = categories.map(cat => cat.id);
-    return <PostThumbnail item={item} categories={categories}></PostThumbnail>;
+    const onReadMorePress = () => navigation.navigate({ routeName: 'post', params: { post: item } });
+
+    return <PostThumbnail item={item} categories={categories} onReadMorePress={onReadMorePress} />;
   }
 
   render() {
+    const { navigation } = this.props;
     let width = Math.round(Dimensions.get("window").width);
 
     return (
@@ -107,9 +117,11 @@ export default class HomeScreen extends Component {
           ></Carousel>
         </View>
         <View style={styles.buttonsBar}>
-          <HomeScreenNavButton>ШКОЛСКИ КУТАК</HomeScreenNavButton>
-          <HomeScreenNavButton>БЛОГ</HomeScreenNavButton>
-          <HomeScreenNavButton>КУЛТУРА</HomeScreenNavButton>
+          {CATEGORY_ITEMS.map(categoryItem => (
+            <HomeScreenNavButton onPress={() => navigation.navigate({ routeName: 'post list', params: { category_id: categoryItem.value } })}>
+              {categoryItem.label}
+            </HomeScreenNavButton>
+          ))}
         </View>
       </View>
     );

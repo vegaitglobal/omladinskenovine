@@ -1,7 +1,7 @@
 import styled, { css } from 'styled-components';
 import React from 'react';
 
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 
 const Container = styled.ScrollView`
   background: #000000;
@@ -37,7 +37,7 @@ MenuItem.Text = styled.Text`
 `;
 
 
-const menu = [
+const menuFactory = (navigation) => ([
   {
     label: "TOP MENU",
     children: [
@@ -49,7 +49,7 @@ const menu = [
   {
     label: "MAIN MENU",
     children: [
-      { label: "NASLOVNA STRANA" },
+      { label: "NASLOVNA STRANA", onPress: () => navigation.navigate('Home') },
       { label: "VESTI" },
       { label: "MAGAZIN" },
       { label: "SKOLSKI KUTAK" },
@@ -57,24 +57,31 @@ const menu = [
       { label: "KULTURA" },
     ],
   },
-]
+]);
 
-const renderMenu = (menuItem) => (
-  <MenuItem>
-    <MenuItem.Wrapper>
-      <MenuItem.Underline underline={!!menuItem.children}>
-        <MenuItem.Text>
-          {menuItem.label}
-        </MenuItem.Text>
-      </MenuItem.Underline>
-    </MenuItem.Wrapper>
+const renderMenu = (menuItem) => {
 
-    {menuItem.children && menuItem.children.map(renderMenu)}
-  </MenuItem>
-);
+  return (
+    <TouchableOpacity onPress={menuItem.onPress}>
+      <MenuItem>
+        <MenuItem.Wrapper>
+          <MenuItem.Underline underline={!!menuItem.children}>
+            <MenuItem.Text>
+              {menuItem.label}
+            </MenuItem.Text>
+          </MenuItem.Underline>
+        </MenuItem.Wrapper>
+
+        {menuItem.children && menuItem.children.map(renderMenu)}
+      </MenuItem>
+    </TouchableOpacity>
+  )
+};
 
 const Drawer = (props) => {
   const { items, navigation } = props;
+
+  const menu = menuFactory(navigation);
 
   return (
     <Container>

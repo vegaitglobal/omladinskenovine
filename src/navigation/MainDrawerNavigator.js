@@ -14,8 +14,8 @@ const drawerNavigatior = createDrawerNavigator({
   Home: {
     screen: HomeScreen,
   },
-  // "post list": PostListScreen,
-  // "post": PostScreen,
+  "post list": PostListScreen,
+  "post": PostScreen,
   // "contact": ContactScreen,
   // "about": AboutScreen,
 }, {

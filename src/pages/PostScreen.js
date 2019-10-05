@@ -61,7 +61,11 @@ const Title = props => {
   );
 };
 
-const PostScreen = ({ post }) => {
+const PostScreen = (props) => {
+  const { navigation } = props;
+  console.log(props);
+  const { post } = navigation.state.params;
+
   if (post === null) {
     return <Text>Loading...</Text>;
   }
