@@ -10,17 +10,25 @@ import AboutScreen from '../pages/AboutScreen';
 import Drawer from '../components/Drawer/Drawer';
 import Header from '../components/Header';
 
-const drawerNavigatior = createDrawerNavigator({
+const StackNavigator = createStackNavigator({
   Home: {
-    screen: ContactScreen,
+    screen: HomeScreen,
   },
   Contact: {
     screen: ContactScreen,
   },
-  "post list": PostListScreen,
-  "post": PostScreen,
-  // "contact": ContactScreen,
-  // "about": AboutScreen,
+  PostList: {
+    screen: PostListScreen,
+  },
+  Post: {
+    screen: PostScreen,
+  }
+},{
+  headerMode: 'none',
+});
+
+const drawerNavigatior = createDrawerNavigator({
+  stack: StackNavigator,
 }, {
   drawerWidth: 250,
   drawerBackgroundColor: '#00a1a1',
