@@ -1,10 +1,17 @@
+<<<<<<< HEAD
+import React from "react";
+import { StyleSheet, Text, View, StatusBar } from "react-native";
+
+import Constants from "expo-constants";
+=======
 
 import { StyleSheet, Text, View, StatusBar } from 'react-native';
 import React, { Component } from "react";
 import Constants from 'expo-constants';
 import * as Font from "expo-font";
+>>>>>>> 0960aac1c2d1a3fd1d91462bed835c292eefa411
 
-import Navigator from './navigation';
+import Navigator from "./navigation";
 
 class App extends Component {
   constructor(props) {
@@ -47,8 +54,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: "#000000",
-  },
+    backgroundColor: "#000000"
+  }
 });
 
 export default App;
