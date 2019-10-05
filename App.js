@@ -1,9 +1,12 @@
-import * as Font from "expo-font";
-import React, { Component } from "react";
-import { Text } from "react-native";
-import HomeScreen from "./pages/HomeScreen";
 
-export default class App extends Component {
+import { StyleSheet, Text, View, StatusBar } from 'react-native';
+import React, { Component } from "react";
+import Constants from 'expo-constants';
+import * as Font from "expo-font";
+
+import Navigator from './navigation';
+
+class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -21,10 +24,31 @@ export default class App extends Component {
   }
 
   render() {
-    return this.state.fontLoaded ? (
-      <HomeScreen></HomeScreen>
-    ) : (
-      <Text>Loading</Text>
-    );
+    const { fontLoaded } = this.state; 
+  
+    if (!fontLoaded) {
+      return (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      )
+    }
+
+    return (
+      <View style={styles.container}>
+        <StatusBar backgroundColor="#000000" barStyle="light-content" />
+        <Navigator />
+      </View>
+    )
   }
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: Constants.statusBarHeight,
+    backgroundColor: "#000000",
+  },
+});
+
+export default App;
