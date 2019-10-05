@@ -1,11 +1,10 @@
 import { Animated, TouchableOpacity, View, Text, TouchableHighlight } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styled from 'styled-components';
-import React, { useEffect } from 'react';
-
-import { Layout } from '../../utils';
+import React, { useState } from 'react';
 
 import Social from './Social';
+import Search from './Search';
 
 const Container = styled.View`
   height: 50px;
@@ -19,7 +18,24 @@ const Container = styled.View`
 
 const Header = (props) => {
   const { navigation } = props;
-  const { openDrawer } = navigation; 
+  const { openDrawer } = navigation;
+
+  const [isSearching, setIsSearching] = useState(false);
+
+  const openSearch = () => setIsSearching(true);
+  const closeSearch = () => setIsSearching(false);
+  const handleSearch = (search) => {
+    console.log(search);
+    closeSearch();
+  }
+
+  if (isSearching) {
+    return (
+      <Container>
+        <Search onSearch={handleSearch} />
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -29,7 +45,7 @@ const Header = (props) => {
 
       <Social />
 
-      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
+      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openSearch}>
         <Ionicons name="ios-search" size={30} color="white" />
       </TouchableOpacity>
     </Container>
