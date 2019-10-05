@@ -1,14 +1,22 @@
 import React, { Component } from "react";
-import { Dimensions, Image, StyleSheet, View } from "react-native";
+import {
+  AsyncStorage,
+  Dimensions,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View
+} from "react-native";
 import Carousel from "react-native-snap-carousel";
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
 import PostThumbnail from "../components/PostThumbnail";
 
 const CATEGORY_ITEMS = [
-  { label: 'ШКОЛСКИ КУТАК', value: 4 },
-  { label: 'БЛОГ', value: 1 },
-  { label: 'КУЛТУРА', value: 8 },
-]
+  { label: "ШКОЛСКИ КУТАК", value: 4 },
+  { label: "БЛОГ", value: 1 },
+  { label: "КУЛТУРА", value: 8 }
+];
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -16,28 +24,64 @@ export default class HomeScreen extends Component {
     this.state = {
       posts: [],
       categories: [],
-      imagesLoaded: false
+      imagesLoaded: false,
+      refreshing: false,
+      connected: false,
+      pageNumber: 1,
+      pageSize: 5
     };
-
-    this.getPosts = this.getPosts.bind(this);
-    this.getCategories = this.getCategories.bind(this);
-    this.renderItem = this.renderItem.bind(this);
   }
 
   componentDidMount() {
-    this.getPosts(5);
-    this.getCategories();
+    const preloadData = async () => {
+      const posts = JSON.parse(await AsyncStorage.getItem("posts"));
+      const categories = JSON.parse(await AsyncStorage.getItem("categories"));
+      if (posts) {
+        this.setState({ posts: posts, categories: categories });
+      } else {
+        this.loadData({});
+      }
+    };
+
+    preloadData();
   }
 
-  async getPosts(number) {
+  loadData = async ({ pageNumber = 1, pageSize = 5, posts = [] }) => {
+    this.setState({ connected: this.props.connected });
+    await this.getPosts(posts, pageNumber, pageSize);
+    await this.getCategories();
+
+    AsyncStorage.setItem("posts", JSON.stringify(this.state.posts));
+    AsyncStorage.setItem("categories", JSON.stringify(this.state.categories));
+  };
+
+  onRefresh = async () => {
+    this.setState({ refreshing: true, pageNumber: 1 });
+    await this.loadData({
+      pageNumber: 1,
+      posts: []
+    });
+    this.setState({ refreshing: false });
+  };
+
+  navigateToPosts = categoryItem => {
+    const { navigation } = this.props;
+
+    navigation.navigate({
+      routeName: "post list",
+      params: { category_id: categoryItem.value }
+    });
+  };
+
+  getPosts = async (prevPosts, pageNumber, pageSize) => {
     await fetch(
-      `http://omladinskenovine.rs/wp-json/wp/v2/posts?per_page=${number}`
+      `http://omladinskenovine.rs/wp-json/wp/v2/posts?page=${pageNumber}&per_page=${pageSize}`
     )
       .then(resp => resp.json())
       .then(async resp => {
-        this.setState({ posts: resp }, async () => {
+        this.setState({ posts: [...prevPosts, ...resp] }, async () => {
           const withImg = await Promise.all(
-            resp.map(async (post, i) => {
+            resp.map(async post => {
               let id = post.featured_media;
               return await fetch(
                 `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
@@ -50,12 +94,14 @@ export default class HomeScreen extends Component {
             })
           );
 
-          this.setState({ posts: withImg, imagesLoaded: true });
+          const posts = [...prevPosts, ...withImg];
+
+          this.setState({ posts: posts, imagesLoaded: true });
         });
       });
-  }
+  };
 
-  async getCategories() {
+  getCategories = async () => {
     await fetch(
       "http://omladinskenovine.rs/wp-json/wp/v2/categories?per_page=100"
     )
@@ -63,9 +109,9 @@ export default class HomeScreen extends Component {
       .then(resp => {
         this.setState({ categories: resp });
       });
-  }
+  };
 
-  async getImage(id) {
+  getImage = async id => {
     let url = null;
 
     await fetch(`http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`)
@@ -75,25 +121,50 @@ export default class HomeScreen extends Component {
       });
 
     return url;
-  }
+  };
 
-  renderItem({ item, index }) {
+  renderItem = ({ item, index }) => {
     const { navigation } = this.props;
 
     let categories = this.state.categories.filter(cat =>
       item.categories.includes(cat.id)
     );
-    const onReadMorePress = () => navigation.navigate({ routeName: 'post', params: { post: item } });
+    const onReadMorePress = () =>
+      navigation.navigate({ routeName: "post", params: { post: item } });
 
-    return <PostThumbnail item={item} categories={categories} onReadMorePress={onReadMorePress} />;
-  }
+    return (
+      <PostThumbnail
+        item={item}
+        categories={categories}
+        onReadMorePress={onReadMorePress}
+      />
+    );
+  };
+
+  determineLastItem = slideIndex => {
+    if (slideIndex === this.state.posts.length - 1) {
+      let pageNumber = this.state.pageNumber + 1;
+      this.setState({ pageNumber: pageNumber });
+      this.loadData({
+        pageNumber,
+        posts: this.state.posts
+      });
+    }
+  };
 
   render() {
-    const { navigation } = this.props;
     let width = Math.round(Dimensions.get("window").width);
 
     return (
-      <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this.onRefresh}
+          />
+        }
+      >
         <View style={styles.logoContainer}>
           <Image
             style={styles.logo}
@@ -108,22 +179,27 @@ export default class HomeScreen extends Component {
         </View>
         <View style={styles.posts}>
           <Carousel
-            loop={true}
+            loop={false}
             autoplay={true}
+            loopClonesPerSide={1}
             data={this.state.posts}
             renderItem={this.renderItem}
             sliderWidth={width}
             itemWidth={width}
+            onBeforeSnapToItem={this.determineLastItem}
           ></Carousel>
         </View>
         <View style={styles.buttonsBar}>
-          {CATEGORY_ITEMS.map(categoryItem => (
-            <HomeScreenNavButton onPress={() => navigation.navigate({ routeName: 'post list', params: { category_id: categoryItem.value } })}>
+          {CATEGORY_ITEMS.map((categoryItem, i) => (
+            <HomeScreenNavButton
+              key={i}
+              onPress={() => this.navigateToPosts(categoryItem)}
+            >
               {categoryItem.label}
             </HomeScreenNavButton>
           ))}
         </View>
-      </View>
+      </ScrollView>
     );
   }
 }
