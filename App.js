@@ -7,6 +7,8 @@ import Toast from "react-native-root-toast";
 import Navigator from "./src/navigation";
 import { INTERNET_CONNECTION_ISSUE_MESSAGE } from "./src/utils/Consts";
 
+import setupNotif from './src/utils/notifications';
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -24,6 +26,8 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    setupNotif();
+
     await Font.loadAsync({
       Oswald: require("./assets/fonts/Oswald-Regular.ttf"),
       "RobotoSlab-Bold": require("./assets/fonts/RobotoSlab-Bold.ttf")
