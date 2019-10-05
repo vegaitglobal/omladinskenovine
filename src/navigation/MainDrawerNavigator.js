@@ -12,7 +12,10 @@ import Header from '../components/Header';
 
 const drawerNavigatior = createDrawerNavigator({
   Home: {
-    screen: HomeScreen,
+    screen: ContactScreen,
+  },
+  Contact: {
+    screen: ContactScreen,
   },
   "post list": PostListScreen,
   "post": PostScreen,
