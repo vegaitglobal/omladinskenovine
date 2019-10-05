@@ -1,17 +1,46 @@
-import React from 'react';
-import { StyleSheet, Text, View, StatusBar } from 'react-native';
 
+import { StyleSheet, Text, View, StatusBar } from 'react-native';
+import React, { Component } from "react";
 import Constants from 'expo-constants';
+import * as Font from "expo-font";
 
 import Navigator from './navigation';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor="#000000" barStyle="light-content" />
-      <Navigator />
-    </View>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      fontLoaded: false
+    };
+  }
+
+  async componentDidMount() {
+    await Font.loadAsync({
+      Oswald: require("./assets/fonts/Oswald-Regular.ttf"),
+      "RobotoSlab-Bold": require("./assets/fonts/RobotoSlab-Bold.ttf")
+    });
+
+    this.setState({ fontLoaded: true });
+  }
+
+  render() {
+    const { fontLoaded } = this.state; 
+  
+    if (!fontLoaded) {
+      return (
+        <View>
+          <Text>Loading</Text>
+        </View>
+      )
+    }
+
+    return (
+      <View style={styles.container}>
+        <StatusBar backgroundColor="#000000" barStyle="light-content" />
+        <Navigator />
+      </View>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -21,3 +50,5 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
   },
 });
+
+export default App;
