@@ -30,11 +30,7 @@ const stackNavigator = createStackNavigator(
       screen: drawerNavigatior,
       navigationOptions: ({ navigation }) => ({
         header: (
-          <Header
-            openDrawer={navigation.openDrawer}
-            navigateHome={() => navigation.navigate("home")}
-            navigation={navigation}
-          />
+          <Header navigation={navigation} />
         )
       }),
     }, 
