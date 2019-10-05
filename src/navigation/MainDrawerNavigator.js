@@ -14,11 +14,12 @@ const drawerNavigatior = createDrawerNavigator({
   Home: {
     screen: ContactScreen,
   },
-  // "post list": PostListScreen,
-  // "post": PostScreen,
   Contact: {
     screen: ContactScreen,
-  }
+  },
+  "post list": PostListScreen,
+  "post": PostScreen,
+  // "contact": ContactScreen,
   // "about": AboutScreen,
 }, {
   drawerWidth: 250,
@@ -32,11 +33,7 @@ const stackNavigator = createStackNavigator(
       screen: drawerNavigatior,
       navigationOptions: ({ navigation }) => ({
         header: (
-          <Header
-            openDrawer={navigation.openDrawer}
-            navigateHome={() => navigation.navigate("home")}
-            navigation={navigation}
-          />
+          <Header navigation={navigation} />
         )
       }),
     }, 

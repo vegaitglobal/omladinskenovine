@@ -1,3 +1,5 @@
+import NetInfo from "@react-native-community/netinfo";
+
 const mapper = {
   0: "ЈАНУАРА",
   1: "ФЕБРУАРА",
@@ -13,8 +15,12 @@ const mapper = {
   11: "ДЕЦЕМБРА"
 };
 
-export function formatDate(dateString) {
+export const formatDate = dateString => {
   let date = new Date(Date.parse(dateString));
 
   return `${date.getDate()}. ${mapper[date.getMonth()]} ${date.getFullYear()}.`;
-}
+};
+
+export const checkConnectivity = async () => {
+  return await NetInfo.isConnected.fetch().then(isConnected => isConnected);
+};

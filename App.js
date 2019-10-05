@@ -1,17 +1,26 @@
-
-import { StyleSheet, Text, View, StatusBar } from 'react-native';
-import React, { Component } from "react";
-import Constants from 'expo-constants';
+import NetInfo from "@react-native-community/netinfo";
+import Constants from "expo-constants";
 import * as Font from "expo-font";
-
+import React, { Component } from "react";
+import { StatusBar, StyleSheet, Text, View } from "react-native";
+import Toast from "react-native-root-toast";
 import Navigator from "./src/navigation";
+import { INTERNET_CONNECTION_ISSUE_MESSAGE } from "./src/utils/Consts";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      fontLoaded: false
+      fontLoaded: false,
+      isConnected: false
     };
+
+    NetInfo.addEventListener(state => {
+      this.setState({ isConnected: state.isConnected });
+      if (!state.isConnected) {
+        Toast.show(INTERNET_CONNECTION_ISSUE_MESSAGE);
+      }
+    });
   }
 
   async componentDidMount() {
@@ -24,14 +33,14 @@ class App extends Component {
   }
 
   render() {
-    const { fontLoaded } = this.state; 
-  
+    const { fontLoaded } = this.state;
+
     if (!fontLoaded) {
       return (
         <View>
           <Text>Loading</Text>
         </View>
-      )
+      );
     }
 
     return (
@@ -39,7 +48,7 @@ class App extends Component {
         <StatusBar backgroundColor="#000000" barStyle="light-content" />
         <Navigator />
       </View>
-    )
+    );
   }
 }
 

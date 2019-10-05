@@ -47,8 +47,11 @@ const SingleListPost = ({ title }) => {
   )
 }
 
-const PostListScreen = ({ category }) => {
-  const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?filter[cat]=${category}`;
+const PostListScreen = (props) => {
+  const { navigation } = props;
+  const { category_id } = navigation.state.params;
+
+  const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?filter[cat]=${category_id}`;
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
