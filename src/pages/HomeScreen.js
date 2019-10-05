@@ -88,7 +88,7 @@ export default class HomeScreen extends Component {
           <Image
             style={styles.logo}
             resizeMode="contain"
-            source={require("../assets/icons/logo.jpg")}
+            source={require("../../assets/icons/logo.jpg")}
           ></Image>
         </View>
         <View style={styles.buttonsBar}>
