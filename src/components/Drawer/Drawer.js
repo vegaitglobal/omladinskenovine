@@ -43,7 +43,7 @@ const menuFactory = navigation => [
     children: [
       { label: "УСПЕШНИ МЛАДИ" },
       { label: "О НАМА" },
-      { label: "КОНТАКТ" }
+      { label: "КОНТАКТ", onPress: () => navigation.navigate("Contact") }
     ]
   },
   {

@@ -67,9 +67,8 @@ export default class HomeScreen extends Component {
   navigateToPosts = categoryItem => {
     const { navigation } = this.props;
 
-    navigation.navigate({
-      routeName: "post list",
-      params: { category_id: categoryItem.value }
+    navigation.push("PostList", {
+      category_id: categoryItem.value
     });
   };
 
@@ -130,7 +129,7 @@ export default class HomeScreen extends Component {
       item.categories.includes(cat.id)
     );
     const onReadMorePress = () =>
-      navigation.navigate({ routeName: "post", params: { post: item } });
+      navigation.push("Post", { post: item });
 
     return (
       <PostThumbnail
