@@ -12,7 +12,7 @@ import Header from '../components/Header';
 
 const drawerNavigatior = createDrawerNavigator({
   Home: {
-    screen: ContactScreen,
+    screen: HomeScreen,
   },
   Contact: {
     screen: ContactScreen,

@@ -32,7 +32,7 @@ const BackgroundImage = styled.Image`
   width: 100%;
 `;
 
-const SinglePostWrapper = styled.TouchableWithoutFeedback`
+const SinglePostWrapper = styled.TouchableOpacity`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -64,7 +64,7 @@ const PostTitle = styled.Text`
     font-size: 25px;
 `;
 
-const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl }) => {
+const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl, handleOnPress }) => {
   const [categories, setCategories] = useState("");
 
   const formattedTitle = rendered
@@ -74,7 +74,7 @@ const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl
   useEffect(() => resolveCategories(categoryIds).then(setCategories), []);
 
   return (
-    <SinglePostWrapper>
+    <SinglePostWrapper onPress={handleOnPress}>
       <BackgroundImage resizeMode="contain" source={{uri: imageUrl}} />
       <Overlay>
         <PostDetails>
@@ -93,7 +93,7 @@ const PostListScreen = (props) => {
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?filter[cat]=${category_id}`;
   const [posts, setPosts] = useState([]);
 
-
+  const handleOnPress = (post) => navigation.push('Post', {post});
   useEffect(() => {
     fetchPostsWithImages(url).then(setPosts);
   }, []);
@@ -102,7 +102,7 @@ const PostListScreen = (props) => {
 
   return (
     <View style={{ height: '100%' }}>
-      <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} />} />
+      <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} handleOnPress={() => handleOnPress(post)}/>} />
     </View>
   )
   
