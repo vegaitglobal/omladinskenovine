@@ -12,7 +12,11 @@
     "react": "16.8.3",
     "react-dom": "16.8.3",
     "react-native": "https://github.com/expo/react-native/archive/sdk-35.0.0.tar.gz",
-    "react-native-web": "^0.11.7"
+    "react-native-anchor-carousel": "^3.1.1",
+    "react-native-carousel": "^0.11.0",
+    "react-native-snap-carousel": "^3.8.1",
+    "react-native-web": "^0.11.7",
+    "styled-components": "^4.4.0"
   },
   "devDependencies": {
     "babel-preset-expo": "^7.0.0"
