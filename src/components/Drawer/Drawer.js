@@ -14,7 +14,7 @@ Container.Content = styled.View`
 `;
 
 const MenuItem = styled.View`
-  padding-left: 10px;
+  padding-left: 16px;
   display: flex;
   flex-direction: column;
 `;
@@ -35,33 +35,44 @@ MenuItem.Underline = styled.View`
 
 MenuItem.Text = styled.Text`
   color: white;
+  font-size: 18px;
+  font-family: 'Oswald';
 `;
 
 const menuFactory = navigation => [
   {
-    label: "Top Menu",
+    label: "MENI",
     children: [
-      { label: "УСПЕШНИ МЛАДИ" },
+      { label: "НАСЛОВНА СТРАНА", onPress: () => navigation.navigate("Home") },
+      { label: "ШКОЛСКИ КУТАК" },
+      { label: "УСПЕШНИ МЛАДИ" },      
+      { label: "БЛОГ" },
       { label: "О НАМА" },
-      { label: "КОНТАКТ", onPress: () => navigation.navigate("Contact") }
+      { label: "КОНТАКТ", onPress: () => navigation.navigate("Contact") },
     ]
   },
   {
-    label: "Main Menu",
+    label: "ВЕСТИ",
     children: [
-      { label: "НАСЛОВНА СТРАНА", onPress: () => navigation.navigate("Home") },
-      { label: "ВЕСТИ" },
-      { label: "МАГАЗИН" },
-      { label: "ШКОЛСКИ КУТАК" },
-      { label: "БЛОГ" },
-      { label: "КУЛТУРА" }
+      { label: "Stipendije" },
+      { label: "Prakse" },
+      { label: "Konkursi" },
+      { label: "Zivot van faksa brt" },
     ]
-  }
+  },
+  {
+    label: "МАГАЗИН",
+    children: [
+      { label: "Kultura" },
+      { label: "Price sa putovanja" },
+      { label: "Zanimljivosti" },
+    ]
+  },
 ];
 
 const renderMenu = (menuItem, i) => {
   return (
-    <TouchableOpacity key={i} onPress={menuItem.onPress}>
+    <TouchableOpacity key={i} onPress={menuItem.onPress} style={{ marginTop: menuItem.children && 15 }}>
       <MenuItem>
         <MenuItem.Wrapper>
           <MenuItem.Underline underline={!!menuItem.children}>
