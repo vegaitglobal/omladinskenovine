@@ -60,7 +60,6 @@ const menuFactory = (navigation) => ([
 ]);
 
 const renderMenu = (menuItem) => {
-
   return (
     <TouchableOpacity onPress={menuItem.onPress}>
       <MenuItem>

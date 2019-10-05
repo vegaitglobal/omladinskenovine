@@ -17,56 +17,21 @@ const Container = styled.View`
   background: #000000;
 `;
 
-const ICON_POSITION = (Layout.window.width / 2) - 46.5;
-
 const Header = (props) => {
-  const { openDrawer, navigation } = props;
-
-  const _animatedOpacity = new Animated.Value(1);
-
-  useEffect(() => {
-    if (navigation.state.drawerMovementDirection === 'opening') {
-      Animated.parallel([
-        Animated.timing(
-          _animatedOpacity,
-          {
-            toValue: 0,
-            duration: 150,
-          },
-        )
-      ]).start()
-    }
-
-    if (navigation.state.drawerMovementDirection === 'closing') {
-      Animated.parallel([
-        Animated.timing(
-          _animatedOpacity,
-          {
-            toValue: 1,
-            duration: 150,
-          },
-        )
-      ]).start()
-    }
-  }, [navigation.state.drawerMovementDirection])
+  const { navigation } = props;
+  const { openDrawer } = navigation; 
 
   return (
     <Container>
-      <Animated.View style={{ opacity: _animatedOpacity }}>
-        <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
-          <Ionicons name="md-menu" size={35} color="white" />
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
+        <Ionicons name="md-menu" size={35} color="white" />
+      </TouchableOpacity>
 
-      <Animated.View style={{ opacity: _animatedOpacity }}>
-        <Social />
-      </Animated.View>
+      <Social />
 
-      <Animated.View style={{ opacity: _animatedOpacity }}>
-        <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
-          <Ionicons name="ios-search" size={30} color="white" />
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
+        <Ionicons name="ios-search" size={30} color="white" />
+      </TouchableOpacity>
     </Container>
   );
 };
