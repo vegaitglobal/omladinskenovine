@@ -1,6 +1,7 @@
 import { View, Text, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import qs from 'query-string';
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async (url) => {
@@ -32,7 +33,7 @@ const BackgroundImage = styled.Image`
   width: 100%;
 `;
 
-const SinglePostWrapper = styled.TouchableWithoutFeedback`
+const SinglePostWrapper = styled.TouchableOpacity`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -71,7 +72,9 @@ const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl
                           .replace("&#8222;", "„")
                           .replace("&#8220;", '"');
 
-  useEffect(() => resolveCategories(categoryIds).then(setCategories), []);
+  useEffect(() => {
+    resolveCategories(categoryIds).then(setCategories)
+  }, []);
 
   return (
     <SinglePostWrapper>
@@ -88,15 +91,21 @@ const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl
 
 const PostListScreen = (props) => {
   const { navigation } = props;
-  const { category_id } = navigation.state.params;
+  const { category_id, search } = navigation.state.params;
 
-  const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?filter[cat]=${category_id}`;
+  const query = qs.stringify({
+    'search': search,
+    'filter[cat]': category_id,
+  });
+
+  const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
   const [posts, setPosts] = useState([]);
 
+  console.log(navigation.state.params)
 
   useEffect(() => {
     fetchPostsWithImages(url).then(setPosts);
-  }, []);
+  }, [navigation.state.params]);
   
   if (posts.length < 0 ) return <View><Text>Loading...</Text></View>
 

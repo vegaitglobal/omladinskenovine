@@ -25,7 +25,7 @@ const Header = (props) => {
   const openSearch = () => setIsSearching(true);
   const closeSearch = () => setIsSearching(false);
   const handleSearch = (search) => {
-    console.log(search);
+    navigation.push("PostList", { search });
     closeSearch();
   }
 
