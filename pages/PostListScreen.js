@@ -14,28 +14,34 @@ const PostListWrapper = styled.FlatList`
 
 `;
 
-const Overlay = styled.View`
-  position: absolute;
-  background-color: rgba(255, 255, 255, 0.3);
-  top: 50%;
-`;
 
-const SinglePostWrapper = styled.View`
+const SinglePostWrapper = styled.TouchableOpacity`
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 0 5% 0 5%;
+  justify-content: center;
 `;
 
+const Overlay = styled.View`
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.4);
+  padding: 20px;
+`;
 
+const PostDetails = styled.View`
+  
+`;
 
 const SingleListPost = ({ title }) => {
   return (
     <SinglePostWrapper>
       <BackgroundImage resizeMode="contain" source={{uri: 'http://lorempixel.com/output/abstract-q-c-640-480-1.jpg'}} />
       <Overlay>
-        <Text>{title.rendered}</Text> 
+        <PostDetails>
+          <Text>{title.rendered}</Text> 
+        </PostDetails>
       </Overlay>
     </SinglePostWrapper>
   )
