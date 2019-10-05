@@ -11,8 +11,15 @@ import {
 import Carousel from "react-native-snap-carousel";
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
 import PostThumbnail from "../components/PostThumbnail";
+import { Linking } from "expo";
 
-const CATEGORY_ITEMS = [
+const topItemsFactory = (navigation) => ([
+  { label: "УСПЕШНИ МЛАДИ", onPress: () => Linking.openURL('https://google.rs') },
+  { label: "О НАМА", onPress: () => navigation.navigate('About') },
+  { label: "КОНТАКТ", onPress: () => navigation.navigate('Contact') }
+]);
+
+const BOTTOM_ITEMS = [
   { label: "ШКОЛСКИ КУТАК", value: 4 },
   { label: "БЛОГ", value: 1 },
   { label: "КУЛТУРА", value: 8 }
@@ -152,7 +159,11 @@ export default class HomeScreen extends Component {
   };
 
   render() {
+    const { navigation } = this.props;
+
     let width = Math.round(Dimensions.get("window").width);
+
+    const topItems = topItemsFactory(navigation);
 
     return (
       <ScrollView
@@ -172,9 +183,14 @@ export default class HomeScreen extends Component {
           ></Image>
         </View>
         <View style={styles.buttonsBar}>
-          <HomeScreenNavButton>УСПЕШНИ МЛАДИ</HomeScreenNavButton>
-          <HomeScreenNavButton>О НАМА</HomeScreenNavButton>
-          <HomeScreenNavButton>КОНТАКТ</HomeScreenNavButton>
+          {topItems.map((item, i) => (
+            <HomeScreenNavButton
+              key={i}
+              onPress={item.onPress}
+            >
+              {item.label}
+            </HomeScreenNavButton>
+          ))}
         </View>
         <View style={styles.posts}>
           <Carousel
@@ -189,7 +205,7 @@ export default class HomeScreen extends Component {
           ></Carousel>
         </View>
         <View style={styles.buttonsBar}>
-          {CATEGORY_ITEMS.map((categoryItem, i) => (
+          {BOTTOM_ITEMS.map((categoryItem, i) => (
             <HomeScreenNavButton
               key={i}
               onPress={() => this.navigateToPosts(categoryItem)}
