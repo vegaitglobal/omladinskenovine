@@ -1,8 +1,30 @@
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, FlatList } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-const fetchPosts = async (url) => await (await fetch(url)).json();
+// const fetchPosts = async (url) => await (await fetch(url)).json();
+const fetchPostsWithImages = async (url) => {
+  const posts = await (await fetch(url)).json();
+  const withImg = await Promise.all(
+    posts.map(async (post, i) => {
+      let id = post.featured_media;
+      let image = await (await fetch(`http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`)).json();
+      return {
+        ...post,
+        imageUrl: image.media_details.sizes.full.source_url
+      }
+    })
+  );
+
+  return withImg;
+}
+
+const resolveCategories = async (categoryIds) => {
+  const categoryLink = "http://omladinskenovine.rs/wp-json/wp/v2/categories?per_page=100";
+  const allCategories = await (await fetch(categoryLink)).json();
+  const categories = allCategories.filter(category => categoryIds.includes(category.id));
+  return categories.map(category => category.name).join(", ");
+}
 
 const BackgroundImage = styled.Image`
   flex: 1;
@@ -10,12 +32,7 @@ const BackgroundImage = styled.Image`
   width: 100%;
 `;
 
-const PostListWrapper = styled.FlatList`
-
-`;
-
-
-const SinglePostWrapper = styled.TouchableOpacity`
+const SinglePostWrapper = styled.TouchableWithoutFeedback`
   position: relative;
   display: flex;
   flex-direction: column;
@@ -26,21 +43,43 @@ const SinglePostWrapper = styled.TouchableOpacity`
 
 const Overlay = styled.View`
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.4);
-  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.85);
+  width: 95%;
+  padding: 30px 10px;
 `;
 
-const PostDetails = styled.View`
-  
+const PostDetails = styled.View``;
+
+const PostCategory = styled.Text`
+    font-family: "Oswald";
+    text-align: center;
+    font-size: 12;
+    color: #EE4528;
 `;
 
-const SingleListPost = ({ title }) => {
+const PostTitle = styled.Text`
+    font-family: "RobotoSlab-Bold";
+    text-align: center;
+    padding: 10px 0;
+    font-size: 25px;
+`;
+
+const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl }) => {
+  const [categories, setCategories] = useState("");
+
+  const formattedTitle = rendered
+                          .replace("&#8222;", "„")
+                          .replace("&#8220;", '"');
+
+  useEffect(() => resolveCategories(categoryIds).then(setCategories), []);
+
   return (
     <SinglePostWrapper>
-      <BackgroundImage resizeMode="contain" source={{uri: 'http://lorempixel.com/output/abstract-q-c-640-480-1.jpg'}} />
+      <BackgroundImage resizeMode="contain" source={{uri: imageUrl}} />
       <Overlay>
         <PostDetails>
-          <Text>{title.rendered}</Text> 
+          <PostCategory>{categories}</PostCategory>
+          <PostTitle>{formattedTitle}</PostTitle> 
         </PostDetails>
       </Overlay>
     </SinglePostWrapper>
@@ -54,15 +93,16 @@ const PostListScreen = (props) => {
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?filter[cat]=${category_id}`;
   const [posts, setPosts] = useState([]);
 
+
   useEffect(() => {
-    fetchPosts(url).then(setPosts)
+    fetchPostsWithImages(url).then(setPosts);
   }, []);
   
-  if (posts.length < 0 ) return <View><Text>HOooe</Text></View>
+  if (posts.length < 0 ) return <View><Text>Loading...</Text></View>
 
   return (
     <View style={{ height: '100%' }}>
-      <PostListWrapper data={posts} renderItem={({ item: post }) => <SingleListPost {...post} />} />
+      <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} />} />
     </View>
   )
   
