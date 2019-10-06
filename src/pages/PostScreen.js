@@ -17,7 +17,7 @@ const variables = {
   }
 };
 
-const FeaturedImageArea = styled(View)`
+const FeaturedImageArea = styled.View`
   width: 100%;
   height: 200;
 `;
@@ -29,7 +29,7 @@ const Date = ({ date }) => {
     </Text>
   );
 };
-const Content = styled(View)`
+const Content = styled.View`
   padding: 15px;
   flex: 1;
   flex-direction: column;
