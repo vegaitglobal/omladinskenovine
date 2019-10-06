@@ -13,11 +13,14 @@ import Carousel from "react-native-snap-carousel";
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
 import PostThumbnail from "../components/PostThumbnail";
 
-const topItemsFactory = (navigation) => ([
-  { label: "УСПЕШНИ МЛАДИ", onPress: () => Linking.openURL('http://uspesnimladi.omladinskenovine.rs/') },
-  { label: "О НАМА", onPress: () => navigation.navigate('About') },
-  { label: "КОНТАКТ", onPress: () => navigation.navigate('Contact') }
-]);
+const topItemsFactory = navigation => [
+  {
+    label: "УСПЕШНИ МЛАДИ",
+    onPress: () => Linking.openURL("http://uspesnimladi.omladinskenovine.rs/")
+  },
+  { label: "О НАМА", onPress: () => navigation.navigate("About") },
+  { label: "КОНТАКТ", onPress: () => navigation.navigate("Contact") }
+];
 
 const BOTTOM_ITEMS = [
   { label: "ШКОЛСКИ КУТАК", value: 4 },
@@ -75,7 +78,8 @@ export default class HomeScreen extends Component {
     const { navigation } = this.props;
 
     navigation.push("PostList", {
-      category_id: categoryItem.value
+      category_id: categoryItem.value,
+      label: categoryItem.label
     });
   };
 
@@ -196,10 +200,7 @@ export default class HomeScreen extends Component {
         </View>
         <View style={styles.buttonsBar}>
           {topItems.map((item, i) => (
-            <HomeScreenNavButton
-              key={i}
-              onPress={item.onPress}
-            >
+            <HomeScreenNavButton key={i} onPress={item.onPress}>
               {item.label}
             </HomeScreenNavButton>
           ))}

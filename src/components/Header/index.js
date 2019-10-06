@@ -1,10 +1,9 @@
-import { Animated, TouchableOpacity, View, Text, TouchableHighlight } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import styled from 'styled-components';
-import React, { useState } from 'react';
-
-import Social from './Social';
-import Search from './Search';
+import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+import { TouchableOpacity } from "react-native";
+import styled from "styled-components";
+import Search from "./Search";
+import Social from "./Social";
 
 const Container = styled.View`
   height: 50px;
@@ -16,7 +15,7 @@ const Container = styled.View`
   background: #000000;
 `;
 
-const Header = (props) => {
+const Header = props => {
   const { navigation } = props;
   const { openDrawer } = navigation;
 
@@ -24,10 +23,10 @@ const Header = (props) => {
 
   const openSearch = () => setIsSearching(true);
   const closeSearch = () => setIsSearching(false);
-  const handleSearch = (search) => {
-    navigation.push("PostList", { search });
+  const handleSearch = search => {
+    navigation.push("PostList", { search, label: "РЕЗУЛТАТИ ПРЕТРАГЕ" });
     closeSearch();
-  }
+  };
 
   if (isSearching) {
     return (
@@ -39,13 +38,19 @@ const Header = (props) => {
 
   return (
     <Container>
-      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openDrawer}>
+      <TouchableOpacity
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        onPress={openDrawer}
+      >
         <Ionicons name="md-menu" size={35} color="white" />
       </TouchableOpacity>
 
       <Social />
 
-      <TouchableOpacity hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }} onPress={openSearch}>
+      <TouchableOpacity
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        onPress={openSearch}
+      >
         <Ionicons name="ios-search" size={30} color="white" />
       </TouchableOpacity>
     </Container>
