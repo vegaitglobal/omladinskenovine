@@ -68,10 +68,6 @@ const PostScreen = props => {
   const { navigation } = props;
   const { post } = navigation.state.params;
 
-  if (post === null) {
-    return <Text>Loading...</Text>;
-  }
-
   return (
     <ScrollView style={{ flex: 1, paddingBottom: 20 }}>
       <FeaturedImageArea>
@@ -112,10 +108,6 @@ const PostScreen = props => {
       </Content>
     </ScrollView>
   );
-};
-
-PostScreen.defaultProps = {
-  post: null
 };
 
 export default PostScreen;
