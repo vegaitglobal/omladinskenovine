@@ -17,7 +17,7 @@ import styled from "styled-components";
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async url => {
   const posts = await (await fetch(url)).json();
-  const withImg = await Promise.all(
+  const withImg = (await Promise.all(
     posts.map(async (post, i) => {
       post.title.rendered = post.title.rendered
         .replace("&#8222;", "„")
@@ -27,12 +27,17 @@ const fetchPostsWithImages = async url => {
       let image = await (await fetch(
         `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
       )).json();
+
+      if (image.data && image.data.status > 400) {
+        return null;
+      }
+
       return {
         ...post,
         image_url: image.media_details.sizes.full.source_url
       };
     })
-  );
+  )).filter(x => x !== null);
 
   return withImg;
 };
@@ -65,6 +70,7 @@ const SinglePostWrapper = styled.TouchableOpacity`
   align-items: center;
   padding: 0 5% 0 5%;
   justify-content: center;
+  margin-bottom: 20px;
 `;
 
 const Overlay = styled.View`
@@ -121,7 +127,7 @@ const SingleListPost = ({
   return (
     <SinglePostWrapper onPress={() => handleOnPress(categories)}>
       <BackgroundImage
-        resizeMode="contain"
+        resizeMode="cover"
         preview={{ uri: imagePreview }}
         uri={image_url}
       />
@@ -145,8 +151,8 @@ const PostListScreen = props => {
   });
 
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
-  const [posts, setPosts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [posts, setPosts] = useState(null);
+  const [categories, setCategories] = useState(null);
 
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
@@ -170,34 +176,38 @@ const PostListScreen = props => {
     getPosts();
   }, [navigation.state.params]);
 
-  if (posts.length < 0)
+  const isLoading = !posts || !categories;
+
+  if (isLoading) {
     return (
-      <View>
-        <Text>Loading...</Text>
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={{ top: "50%" }}
+          animating={true}
+        />
       </View>
     );
+  }
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator
-        size="large"
-        style={{ top: "50%" }}
-        animating={!posts.length}
-      ></ActivityIndicator>
       <View style={styles.title}>
         <Text style={styles.titleText}>{label}</Text>
       </View>
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => `${item.id}` }
-        renderItem={({ item: post }) => (
-          <SingleListPost
-            {...post}
-            allCategories={categories}
-            handleOnPress={categories => handleOnPress(post, categories)}
-          />
-        )}
-      />
+      <View>
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => `${item.id}` }
+          renderItem={({ item: post }) => (
+            <SingleListPost
+              {...post}
+              allCategories={categories}
+              handleOnPress={categories => handleOnPress(post, categories)}
+            />
+          )}
+        />
+      </View>
     </View>
   );
 };
@@ -206,13 +216,13 @@ export default PostListScreen;
 
 const styles = StyleSheet.create({
   container: {
-    height: "100%",
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   title: {
     paddingHorizontal: 15,
+    marginVertical: 10,
     backgroundColor: "#000000"
   },
   titleText: {
