@@ -2,6 +2,19 @@ import React, { Component } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { formatDate } from "../utils/Utils";
 
+export const ReadMoreButton = (props) => {
+  const { onPress, style } = props;
+ 
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{ ...styles.readMore, ...style }}
+    >
+      <Text style={styles.readText}>ПРОЧИТАЈ ВИШЕ</Text>
+    </TouchableOpacity>
+  )
+}
+
 export default class PostThumbnail extends Component {
   render() {
     const { onReadMorePress, item } = this.props;
@@ -30,12 +43,9 @@ export default class PostThumbnail extends Component {
           <Text style={styles.categories}>{categoriesString}</Text>
           <Text style={styles.date}>{date}</Text>
           <Text style={styles.title}>{title}</Text>
-          <TouchableOpacity
+          <ReadMoreButton
             onPress={handleReadMorePress}
-            style={styles.readMore}
-          >
-            <Text style={styles.readText}>ПРОЧИТАЈ ВИШЕ</Text>
-          </TouchableOpacity>
+          />
         </View>
       </View>
     );

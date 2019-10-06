@@ -1,0 +1,247 @@
+diff --git a/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js b/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js
+index daf7a10..72cd7aa 100644
+--- a/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js
++++ b/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js
+@@ -14,6 +14,7 @@ export default StyleSheet.create({
+   },
+   username: {
+     color: "white",
++    fontFamily: 'Oswald',
+     fontSize: 16
+   }
+ });
+diff --git a/node_modules/react-native-story/src/components/stories/view/storiesView.js b/node_modules/react-native-story/src/components/stories/view/storiesView.js
+index 1f0beae..70c3d8c 100644
+--- a/node_modules/react-native-story/src/components/stories/view/storiesView.js
++++ b/node_modules/react-native-story/src/components/stories/view/storiesView.js
+@@ -83,7 +83,7 @@ export default class Stories extends PureComponent {
+ 
+   render() {
+     const { x, ready } = this.state;
+-    const { stories, selectedStory, footerComponent } = this.props;
++    const { stories, selectedStory, footerComponent, onStoryPress } = this.props;
+ 
+     return (
+       <View style={styles.container}>
+@@ -111,6 +111,7 @@ export default class Stories extends PureComponent {
+                 footerComponent={footerComponent}
+                 handleSelectedStoryOnLoaded={this._handleSelectedStoryOnLoaded}
+                 selectedStory={selectedStory}
++                onStoryPress={onStoryPress}
+                 {...{ story }}
+               />
+             </Animated.View>
+diff --git a/node_modules/react-native-story/src/components/story/view/storyStyles.js b/node_modules/react-native-story/src/components/story/view/storyStyles.js
+index 24821ea..6d164ac 100644
+--- a/node_modules/react-native-story/src/components/story/view/storyStyles.js
++++ b/node_modules/react-native-story/src/components/story/view/storyStyles.js
+@@ -3,10 +3,9 @@ import { Dimensions } from "react-native";
+ 
+ export default StyleSheet.create({
+   storyListContainer: {
+-    marginTop: 50
+   },
+   modal: {
+-    height: Dimensions.get("window").height,
++    height: Dimensions.get("window").height - 200,
+     width: Dimensions.get("window").width,
+     flex: 1
+   }
+diff --git a/node_modules/react-native-story/src/components/story/view/storyView.js b/node_modules/react-native-story/src/components/story/view/storyView.js
+index a8cc29a..1dc2af4 100644
+--- a/node_modules/react-native-story/src/components/story/view/storyView.js
++++ b/node_modules/react-native-story/src/components/story/view/storyView.js
+@@ -1,6 +1,8 @@
+ import React, { Component, Fragment } from "react";
+ import { View } from "react-native";
+ import Modal from "react-native-modalbox";
++import { Dimensions } from "react-native";
++import Constants from 'expo-constants';
+ 
+ // Components
+ import { StoryList, Stories } from "../../../components";
+@@ -21,7 +23,7 @@ class StoryListView extends Component {
+ 
+   // Component Functions
+   _handleStoryItemPress = (item, index) => {
+-    const { stories } = this.props;
++    const { stories, onStoryOpen } = this.props;
+ 
+     this.setState({ selectedStory: item });
+ 
+@@ -34,6 +36,7 @@ class StoryListView extends Component {
+ 
+     this.setState({ orderedStories });
+     this.setState({ isModalOpen: true });
++    onStoryOpen(item, index);
+   };
+ 
+   render() {
+@@ -41,33 +44,41 @@ class StoryListView extends Component {
+       stories,
+       footerComponent,
+       unPressedBorderColor,
+-      pressedBorderColor
++      pressedBorderColor,
++      onStoryClose,
++      onStoryPress,
+     } = this.props;
+     const { isModalOpen, orderedStories, selectedStory } = this.state;
+ 
+     return (
+       <Fragment>
+-        <View style={styles.storyListContainer}>
+           <StoryList
+             handleStoryItemPress={this._handleStoryItemPress}
+             stories={stories}
+             unPressedBorderColor={unPressedBorderColor}
+             pressedBorderColor={pressedBorderColor}
+           />
+-        </View>
+         <Modal
+-          style={styles.modal}
++          style={{
++            height: isModalOpen ? Dimensions.get("window").height - 50 - Constants.statusBarHeight : 0,
++            width: isModalOpen ? Dimensions.get("window").width: 0,
++            // flex: 1
++          }}
+           isOpen={isModalOpen}
+-          onClosed={() => this.setState({ isModalOpen: false })}
++          onClosed={() => {
++            this.setState({ isModalOpen: false });
++            onStoryClose();
++          }}
+           position="center"
+           swipeToClose
+-          swipeArea={250}
++          swipeArea={350}
+           backButtonClose
+         >
+           <Stories
+             footerComponent={footerComponent}
+             selectedStory={selectedStory}
+             stories={orderedStories}
++            onStoryPress={onStoryPress}
+           />
+         </Modal>
+       </Fragment>
+diff --git a/node_modules/react-native-story/src/components/storyItem/view/storyItemStyles.js b/node_modules/react-native-story/src/components/storyItem/view/storyItemStyles.js
+index 2a87f9d..70cddbf 100644
+--- a/node_modules/react-native-story/src/components/storyItem/view/storyItemStyles.js
++++ b/node_modules/react-native-story/src/components/storyItem/view/storyItemStyles.js
+@@ -4,6 +4,7 @@ import { Dimensions } from "react-native";
+ export default StyleSheet.create({
+     container: {
+       flex: 1,
++      backgroundColor: '#000000',
+     },
+     image: {
+       ...StyleSheet.absoluteFillObject,
+@@ -11,9 +12,10 @@ export default StyleSheet.create({
+       height: Dimensions.get("window").height,
+     },
+     footer: {
++      backgroundColor: '#000000',
+       flexDirection: 'row',
+       alignItems: 'center',
+-      justifyContent: 'space-between',
++      justifyContent: 'center',
+       padding: 16,
+     },
+   });
+\ No newline at end of file
+diff --git a/node_modules/react-native-story/src/components/storyItem/view/storyItemView.js b/node_modules/react-native-story/src/components/storyItem/view/storyItemView.js
+index f81eccb..4c98e46 100644
+--- a/node_modules/react-native-story/src/components/storyItem/view/storyItemView.js
++++ b/node_modules/react-native-story/src/components/storyItem/view/storyItemView.js
+@@ -1,6 +1,6 @@
+ // @flow
+ import React, { Fragment, PureComponent } from "react";
+-import { View, Image } from "react-native";
++import { View, Image, TouchableOpacity } from "react-native";
+ 
+ import styles from "./storyItemStyles";
+ 
+@@ -9,28 +9,31 @@ import Avatar from "../../avatar/view/avatarView";
+ export default class extends PureComponent {
+   render() {
+     const {
+-      story: { source, user, avatar, id },
++      story,
+       selectedStory,
+       handleSelectedStoryOnLoaded,
+       footerComponent
+     } = this.props;
++    const { source, user, avatar, id } = story;
++
+     return (
+       <Fragment>
+-        <View style={styles.container}>
+-          <Image
+-            onLoad={() =>
+-              selectedStory &&
+-              selectedStory.id === id &&
+-              handleSelectedStoryOnLoaded()
+-            }
+-            style={styles.image}
+-            {...{ source }}
+-          />
+-          <Avatar {...{ user, avatar }} />
+-        </View>
+-        {footerComponent && (
+-          <View style={styles.footer}>{footerComponent}</View>
+-        )}
++          <View style={styles.container}>
++            <Image
++              onLoad={() =>
++                selectedStory &&
++                selectedStory.id === id &&
++                handleSelectedStoryOnLoaded()
++              }
++              style={styles.image}
++              resizeMode="contain"
++              {...{ source }}
++            />
++            <Avatar {...{ user, avatar }} />
++          </View>
++          {footerComponent && (
++            <View style={styles.footer}>{footerComponent(story)}</View>
++          )}
+       </Fragment>
+     );
+   }
+diff --git a/node_modules/react-native-story/src/components/storyList/view/storyListView.js b/node_modules/react-native-story/src/components/storyList/view/storyListView.js
+index 02bc47e..65eeeca 100644
+--- a/node_modules/react-native-story/src/components/storyList/view/storyListView.js
++++ b/node_modules/react-native-story/src/components/storyList/view/storyListView.js
+@@ -27,6 +27,7 @@ class StoryListView extends Component {
+         <FlatList
+           data={stories}
+           horizontal
++          showsHorizontalScrollIndicator={false}
+           renderItem={({ item, index }) => (
+             <StoryListItem
+               handleStoryItemPress={() =>
+diff --git a/node_modules/react-native-story/src/components/storyListItem/view/storyListItemView.js b/node_modules/react-native-story/src/components/storyListItem/view/storyListItemView.js
+index 0735a40..120b90c 100644
+--- a/node_modules/react-native-story/src/components/storyListItem/view/storyListItemView.js
++++ b/node_modules/react-native-story/src/components/storyListItem/view/storyListItemView.js
+@@ -7,6 +7,9 @@ import DEFAULT_AVATAR from "../../../assets/avatars/no_avatar.png";
+ // Components
+ import styles from "./storyListItemStyles";
+ 
++const truncate = (text, max) =>
++  text.substr(0,max-1)+(text.length>max?'…':'');
++
+ class StoryListItemView extends Component {
+   constructor(props) {
+     super(props);
+@@ -55,7 +58,7 @@ class StoryListItemView extends Component {
+             defaultSource={DEFAULT_AVATAR}
+           />
+         </TouchableOpacity>
+-        <Text style={styles.itemText}>{item.user}</Text>
++        <Text style={styles.itemText}>{truncate(item.user, 10)}</Text>
+       </View>
+     );
+   }
