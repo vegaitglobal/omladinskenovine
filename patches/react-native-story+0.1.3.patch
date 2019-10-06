@@ -11,7 +11,7 @@ index daf7a10..72cd7aa 100644
    }
  });
 diff --git a/node_modules/react-native-story/src/components/stories/view/storiesView.js b/node_modules/react-native-story/src/components/stories/view/storiesView.js
-index 1f0beae..70c3d8c 100644
+index 1f0beae..3e95e46 100644
 --- a/node_modules/react-native-story/src/components/stories/view/storiesView.js
 +++ b/node_modules/react-native-story/src/components/stories/view/storiesView.js
 @@ -83,7 +83,7 @@ export default class Stories extends PureComponent {
@@ -31,6 +31,27 @@ index 1f0beae..70c3d8c 100644
                  {...{ story }}
                />
              </Animated.View>
+@@ -118,7 +119,10 @@ export default class Stories extends PureComponent {
+           .reverse()}
+         <Animated.ScrollView
+           ref={this.scroll}
+-          style={StyleSheet.absoluteFillObject}
++          style={{
++            ...StyleSheet.absoluteFillObject,
++            bottom: 80,
++          }}
+           showsHorizontalScrollIndicator={false}
+           scrollEventThrottle={16}
+           snapToInterval={width}
+@@ -133,7 +137,7 @@ export default class Stories extends PureComponent {
+             ],
+             { useNativeDriver: true }
+           )}
+-          decelerationRate={0.99}
++          decelerationRate={0.5}
+           horizontal
+         />
+       </View>
 diff --git a/node_modules/react-native-story/src/components/story/view/storyStyles.js b/node_modules/react-native-story/src/components/story/view/storyStyles.js
 index 24821ea..6d164ac 100644
 --- a/node_modules/react-native-story/src/components/story/view/storyStyles.js
@@ -48,7 +69,7 @@ index 24821ea..6d164ac 100644
      flex: 1
    }
 diff --git a/node_modules/react-native-story/src/components/story/view/storyView.js b/node_modules/react-native-story/src/components/story/view/storyView.js
-index a8cc29a..1dc2af4 100644
+index a8cc29a..f99d12d 100644
 --- a/node_modules/react-native-story/src/components/story/view/storyView.js
 +++ b/node_modules/react-native-story/src/components/story/view/storyView.js
 @@ -1,6 +1,8 @@
@@ -77,7 +98,7 @@ index a8cc29a..1dc2af4 100644
    };
  
    render() {
-@@ -41,33 +44,41 @@ class StoryListView extends Component {
+@@ -41,33 +44,37 @@ class StoryListView extends Component {
        stories,
        footerComponent,
        unPressedBorderColor,
@@ -99,12 +120,7 @@ index a8cc29a..1dc2af4 100644
            />
 -        </View>
          <Modal
--          style={styles.modal}
-+          style={{
-+            height: isModalOpen ? Dimensions.get("window").height - 50 - Constants.statusBarHeight : 0,
-+            width: isModalOpen ? Dimensions.get("window").width: 0,
-+            // flex: 1
-+          }}
+           style={styles.modal}
            isOpen={isModalOpen}
 -          onClosed={() => this.setState({ isModalOpen: false })}
 +          onClosed={() => {
@@ -114,7 +130,7 @@ index a8cc29a..1dc2af4 100644
            position="center"
            swipeToClose
 -          swipeArea={250}
-+          swipeArea={350}
++          swipeArea={200}
            backButtonClose
          >
            <Stories

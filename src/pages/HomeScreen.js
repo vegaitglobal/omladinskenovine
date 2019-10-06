@@ -264,7 +264,7 @@ export default class HomeScreen extends Component {
     const stories = posts
       .filter(post => post.image_url)
       .map((post) => ({
-        id: `${post.id}`,
+        id: `${post.id}-${Math.random()}`,
         source: { uri: post.image_url },
         avatar: { uri: post.image_url },
         user: post.title.rendered,
