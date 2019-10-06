@@ -176,7 +176,7 @@ const PostListScreen = props => {
     getPosts();
   }, [navigation.state.params]);
 
-  const isLoading = !posts || !categories;
+  const isLoading = !posts;
 
   if (isLoading) {
     return (
@@ -202,7 +202,7 @@ const PostListScreen = props => {
           renderItem={({ item: post }) => (
             <SingleListPost
               {...post}
-              allCategories={categories}
+              allCategories={categories || []}
               handleOnPress={categories => handleOnPress(post, categories)}
             />
           )}
