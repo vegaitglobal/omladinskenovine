@@ -7,11 +7,15 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  View
+  View,
+  TextInput,
+  Button,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
+import Story from 'react-native-story'
+
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
-import PostThumbnail from "../components/PostThumbnail";
+import PostThumbnail, { ReadMoreButton } from "../components/PostThumbnail";
 
 const topItemsFactory = navigation => [
   {
@@ -28,6 +32,81 @@ const BOTTOM_ITEMS = [
   { label: "КУЛТУРА", value: 8 }
 ];
 
+// const stories = [
+//   {
+//     id: "4",
+//     source: require("../../assets/splash.png"),
+//     user: "Ugur Erdal",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "2",
+//     source: require("../../assets/splash.png"),
+//     user: "Mustafa",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "5",
+//     source: require("../../assets/splash.png"),
+//     user: "Emre Yilmaz",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "3",
+//     source: require("../../assets/splash.png"),
+//     user: "Cenk Gun",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "3456345634",
+//     source: require("../../assets/splash.png"),
+//     user: "Ugur Erdal",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "34645364",
+//     source: require("../../assets/splash.png"),
+//     user: "Mustafa",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "5",
+//     source: require("../../assets/splash.png"),
+//     user: "Emre Yilmaz",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "34564536",
+//     source: require("../../assets/splash.png"),
+//     user: "Cenk Gun",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "4356345636",
+//     source: require("../../assets/splash.png"),
+//     user: "Ugur Erdal",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "14234536",
+//     source: require("../../assets/splash.png"),
+//     user: "Mustafa",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "123123",
+//     source: require("../../assets/splash.png"),
+//     user: "Emre Yilmaz",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+//   {
+//     id: "123123",
+//     source: require("../../assets/splash.png"),
+//     user: "Cenk Gun",
+//     avatar: require("../../assets/icons/logo.jpg")
+//   },
+// ];
+
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -38,7 +117,7 @@ export default class HomeScreen extends Component {
       refreshing: false,
       connected: false,
       pageNumber: 1,
-      pageSize: 5
+      pageSize: 5,
     };
   }
 
@@ -176,58 +255,89 @@ export default class HomeScreen extends Component {
 
   render() {
     const { navigation } = this.props;
+    const { posts, categories } = this.state;
 
     let width = Math.round(Dimensions.get("window").width);
 
     const topItems = topItemsFactory(navigation);
 
-    return (
-      <ScrollView
-        contentContainerStyle={styles.container}
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.refreshing}
-            onRefresh={this.onRefresh}
-          />
+    const stories = posts
+      .filter(post => post.image_url)
+      .map((post) => ({
+        id: `${post.id}-${Math.random()}`,
+        source: { uri: post.image_url },
+        avatar: { uri: post.image_url },
+        user: post.title.rendered,
+        data: {
+          post,
+          categories,
         }
-      >
-        <View style={styles.logoContainer}>
-          <Image
-            style={styles.logo}
-            resizeMode="contain"
-            source={require("../../assets/icons/logo.jpg")}
-          ></Image>
-        </View>
-        <View style={styles.buttonsBar}>
-          {topItems.map((item, i) => (
-            <HomeScreenNavButton key={i} onPress={item.onPress}>
-              {item.label}
-            </HomeScreenNavButton>
-          ))}
-        </View>
-        <View style={styles.posts}>
-          <Carousel
-            loop={false}
-            autoplay={true}
-            loopClonesPerSide={1}
-            data={this.state.posts}
-            renderItem={this.renderItem}
-            sliderWidth={width}
-            itemWidth={width}
-            onBeforeSnapToItem={this.determineLastItem}
-          ></Carousel>
-        </View>
-        <View style={styles.buttonsBar}>
-          {BOTTOM_ITEMS.map((categoryItem, i) => (
-            <HomeScreenNavButton
-              key={i}
-              onPress={() => this.navigateToPosts(categoryItem)}
-            >
-              {categoryItem.label}
-            </HomeScreenNavButton>
-          ))}
-        </View>
+      }));
+
+    return (
+      <View style={{ height: '100%' }}>
+        <Story
+          onStoryOpen={() => this.setState({ viewingStory: true })}
+          onStoryClose={() => this.setState({ viewingStory: false })}
+          unPressedBorderColor="#e95950"
+          pressedBorderColor="#ebebeb"
+          stories={stories}
+          onStoryPress={(story) => navigation.push("Post", story.data)}
+          footerComponent={(story) => (
+            <ReadMoreButton
+              style={{ marginBottom: 25 }}
+              onPress={() => navigation.push("Post", story.data)}
+            />
+          )}
+        />
+
+        <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />
+          }
+        >
+          {/* <View style={styles.logoContainer}>
+            <Image
+              style={styles.logo}
+              resizeMode="contain"
+              source={require("../../assets/icons/logo.jpg")}
+            ></Image>
+          </View> */}
+          <View style={styles.buttonsBar}>
+            {topItems.map((item, i) => (
+              <HomeScreenNavButton key={i} onPress={item.onPress}>
+                {item.label}
+              </HomeScreenNavButton>
+            ))}
+          </View>
+          <View style={styles.posts}>
+            <Carousel
+              loop={false}
+              autoplay={true}
+              loopClonesPerSide={1}
+              data={this.state.posts}
+              renderItem={this.renderItem}
+              sliderWidth={width}
+              itemWidth={width}
+              onBeforeSnapToItem={this.determineLastItem}
+            ></Carousel>
+          </View>
+          <View style={styles.buttonsBar}>
+            {BOTTOM_ITEMS.map((categoryItem, i) => (
+              <HomeScreenNavButton
+                key={i}
+                onPress={() => this.navigateToPosts(categoryItem)}
+              >
+                {categoryItem.label}
+              </HomeScreenNavButton>
+            ))}
+          </View>
       </ScrollView>
+      </View>
     );
   }
 }
