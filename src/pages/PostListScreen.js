@@ -235,17 +235,23 @@ const PostListScreen = props => {
         <Text style={styles.titleText}>{label}</Text>
       </View>
       <View>
-        <FlatList
-          data={posts}
-          keyExtractor={item => `${item.id}`}
-          renderItem={({ item: post }) => (
-            <SingleListPost
-              {...post}
-              allCategories={categories || []}
-              handleOnPress={categories => handleOnPress(post, categories)}
-            />
-          )}
-        />
+        {posts.length === 0 ? (
+          <Text style={{ paddingTop: 30, fontSize: 20, textAlign: "center" }}>
+            Нема резултата
+          </Text>
+        ) : (
+          <FlatList
+            data={posts}
+            keyExtractor={item => `${item.id}`}
+            renderItem={({ item: post }) => (
+              <SingleListPost
+                {...post}
+                allCategories={categories || []}
+                handleOnPress={categories => handleOnPress(post, categories)}
+              />
+            )}
+          />
+        )}
       </View>
     </View>
   );
