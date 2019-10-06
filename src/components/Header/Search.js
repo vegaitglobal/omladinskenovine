@@ -1,6 +1,6 @@
-import styled from 'styled-components';
-import { View, Button } from 'react-native';
-import React, { useState } from 'react';
+import styled from "styled-components";
+import { View, Button } from "react-native";
+import React, { useState } from "react";
 
 const Container = styled.View`
   display: flex;
@@ -13,12 +13,12 @@ const TextInput = styled.TextInput`
   background: #ffffff;
   color: #000000;
   padding: 0 15px;
-`
+`;
 
-const Search = (props) => {
-  const { onSearch } = props;
+const Search = props => {
+  const { onSearch, onBlur } = props;
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const handleSearch = () => onSearch(search);
 
@@ -28,15 +28,18 @@ const Search = (props) => {
         autoFocus={true}
         onChangeText={setSearch}
         value={search}
+        onBlur={onBlur}
         onSubmitEditing={handleSearch}
         returnKeyType={"search"}
       />
       <Button
-        title="Pretraga"
+        style={{ backgroundColor: "#f25529" }}
+        color="#f25529"
+        title="Тражи"
         onPress={handleSearch}
       />
     </Container>
   );
-}
+};
 
 export default Search;

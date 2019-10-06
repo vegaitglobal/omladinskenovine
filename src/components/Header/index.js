@@ -24,14 +24,14 @@ const Header = props => {
   const openSearch = () => setIsSearching(true);
   const closeSearch = () => setIsSearching(false);
   const handleSearch = search => {
-    navigation.push("PostList", { search, label: "РЕЗУЛТАТИ ПРЕТРАГЕ" });
+    navigation.push("PostList", { search, label: "РЕЗУЛТАТИ" });
     closeSearch();
   };
 
   if (isSearching) {
     return (
       <Container>
-        <Search onSearch={handleSearch} />
+        <Search onSearch={handleSearch} onBlur={closeSearch} />
       </Container>
     );
   }

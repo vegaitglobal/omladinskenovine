@@ -94,9 +94,9 @@ const PostScreen = props => {
 
         <HTML
           html={post.content.rendered}
-          baseFontStyle={{ fontSize: 14 }}
+          baseFontStyle={{ fontSize: 16 }}
           tagsStyles={{
-            p: { textAlign: "justify" },
+            p: { textAlign: "justify", maxWidth: "100%", lineHeight: 21 },
             img: {
               width: Dimensions.get("window").width - 30,
               height: 200,
@@ -108,7 +108,16 @@ const PostScreen = props => {
               marginTop: 10
             }
           }}
-          classesStyles={{ "wp-caption-text": { maxWidth: "100%" } }}
+          classesStyles={{
+            "wp-caption-text": {
+              maxWidth: Dimensions.get("window").width - 30,
+              fontStyle: "italic",
+              lineHeight: 14,
+              marginBottom: 7,
+              fontSize: 12,
+              color: variables.colors.textSecondary
+            }
+          }}
           imagesInitialDimensions={{
             width: Dimensions.get("window").width - 30,
             height: 200
