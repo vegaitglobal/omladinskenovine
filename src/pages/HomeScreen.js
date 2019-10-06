@@ -1,3 +1,4 @@
+import { Linking } from "expo";
 import React, { Component } from "react";
 import {
   AsyncStorage,
@@ -14,7 +15,7 @@ import PostThumbnail from "../components/PostThumbnail";
 import { Linking } from "expo";
 
 const topItemsFactory = (navigation) => ([
-  { label: "УСПЕШНИ МЛАДИ", onPress: () => Linking.openURL('https://google.rs') },
+  { label: "УСПЕШНИ МЛАДИ", onPress: () => Linking.openURL('http://uspesnimladi.omladinskenovine.rs/') },
   { label: "О НАМА", onPress: () => navigation.navigate('About') },
   { label: "КОНТАКТ", onPress: () => navigation.navigate('Contact') }
 ]);
@@ -79,6 +80,14 @@ export default class HomeScreen extends Component {
     });
   };
 
+  navigate = routeName => {
+    const { navigation } = this.props;
+
+    navigation.navigate({
+      routeName: routeName
+    });
+  };
+
   getPosts = async (prevPosts, pageNumber, pageSize) => {
     await fetch(
       `http://omladinskenovine.rs/wp-json/wp/v2/posts?page=${pageNumber}&per_page=${pageSize}`
@@ -88,6 +97,10 @@ export default class HomeScreen extends Component {
         this.setState({ posts: [...prevPosts, ...resp] }, async () => {
           const withImg = await Promise.all(
             resp.map(async post => {
+              post.title.rendered = post.title.rendered
+                .replace("&#8222;", "„")
+                .replace("&#8220;", '"')
+                .replace("&#8211;", "-");
               let id = post.featured_media;
               return await fetch(
                 `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
@@ -135,8 +148,8 @@ export default class HomeScreen extends Component {
     let categories = this.state.categories.filter(cat =>
       item.categories.includes(cat.id)
     );
-    const onReadMorePress = () =>
-      navigation.push("Post", { post: item });
+    const onReadMorePress = ({ post, categories }) =>
+      navigation.push("Post", { post, categories });
 
     return (
       <PostThumbnail

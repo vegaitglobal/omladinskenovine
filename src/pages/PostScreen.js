@@ -1,15 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
-  View,
   ImageBackground,
   ScrollView,
-  Text,
   StyleSheet,
-  Dimensions
+  Text,
+  View
 } from "react-native";
-import styled from "styled-components";
-import HTML from "react-native-render-html";
 import HTMLView from "react-native-htmlview";
+import styled from "styled-components";
+import { formatDate } from "../utils/Utils";
 
 const styles = StyleSheet.create({
   a: {
@@ -61,10 +60,9 @@ const Title = props => {
   );
 };
 
-const PostScreen = (props) => {
+const PostScreen = props => {
   const { navigation } = props;
-  console.log(props);
-  const { post } = navigation.state.params;
+  const { post, categories } = navigation.state.params;
 
   if (post === null) {
     return <Text>Loading...</Text>;
@@ -76,17 +74,16 @@ const PostScreen = (props) => {
         <ImageBackground
           style={{ width: "100%", height: "100%" }}
           source={{
-            uri:
-              "https://images.unsplash.com/photo-1557528790-57703e26314d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2100&q=80"
+            uri: post.image_url
           }}
         ></ImageBackground>
       </FeaturedImage>
 
       <Content>
         <Title size={1}>{post.title.rendered}</Title>
-        <Category>Categories...</Category>
+        <Category>{categories.map(c => c.name).join(", ")}</Category>
 
-        <Text style={{ marginBottom: 5 }}>{post.date}</Text>
+        <Text style={{ marginBottom: 5 }}>{formatDate(post.date)}</Text>
         <HTMLView value={post.content.rendered} stylesheet={styles} />
       </Content>
     </ScrollView>
