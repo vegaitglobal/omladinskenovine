@@ -1,7 +1,8 @@
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, AsyncStorage } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import qs from 'query-string';
+import { Image as CachedImage, CacheManager } from 'react-native-expo-image-cache';
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async (url) => {
@@ -27,7 +28,7 @@ const resolveCategories = async (categoryIds) => {
   return categories.map(category => category.name).join(", ");
 }
 
-const BackgroundImage = styled.Image`
+const BackgroundImage = styled(CachedImage)`
   flex: 1;
   aspect-ratio: 1;
   width: 100%;
@@ -67,6 +68,7 @@ const PostTitle = styled.Text`
 
 const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl, handleOnPress }) => {
   const [categories, setCategories] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
 
   const formattedTitle = rendered
                           .replace("&#8222;", "„")
@@ -76,9 +78,21 @@ const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl
     resolveCategories(categoryIds).then(setCategories)
   }, []);
 
+
+  CacheManager
+    .get(imageUrl)
+    .getPath()
+    .then((url) => {
+      setImagePreview(url);
+    });
+
+  if (!imagePreview) {
+    return null;
+  }
+
   return (
     <SinglePostWrapper onPress={handleOnPress}>
-      <BackgroundImage resizeMode="contain" source={{uri: imageUrl}} />
+      <BackgroundImage resizeMode="contain" preview={{ uri: imagePreview }} uri={imageUrl} />
       <Overlay>
         <PostDetails>
           <PostCategory>{categories}</PostCategory>
@@ -102,10 +116,25 @@ const PostListScreen = (props) => {
   const [posts, setPosts] = useState([]);
 
   const handleOnPress = (post) => navigation.push('Post', {post});
+
   useEffect(() => {
-    fetchPostsWithImages(url).then(setPosts);
+    const getPosts = async () => {
+      const cachedPosts = JSON.parse(await AsyncStorage.getItem(query));
+
+      if (cachedPosts) {
+        return setPosts(cachedPosts)
+      }
+
+      return fetchPostsWithImages(url).then((posts) => {
+        setPosts(posts);
+        AsyncStorage.setItem(query, JSON.stringify(posts));
+      });
+    };
+
+    getPosts();
+    
   }, [navigation.state.params]);
-  
+
   if (posts.length < 0 ) return <View><Text>Loading...</Text></View>
 
   return (
@@ -113,9 +142,7 @@ const PostListScreen = (props) => {
       <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} handleOnPress={() => handleOnPress(post)}/>} />
     </View>
   )
-  
-  
+    
 }
-
 
 export default PostListScreen;
