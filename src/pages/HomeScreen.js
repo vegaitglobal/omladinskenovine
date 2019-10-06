@@ -184,16 +184,22 @@ export default class HomeScreen extends Component {
 
     const stories = posts
       .filter(post => post.image_url)
-      .map(post => ({
-        id: `${post.id}-${Math.random()}`,
-        source: { uri: post.image_url },
-        avatar: { uri: post.image_url },
-        user: post.title.rendered,
-        data: {
-          post,
-          categories
-        }
-      }));
+      .map(post => {
+        const post_categories = categories.filter(category =>
+          post.categories.includes(category.id)
+        );
+
+        return ({
+          id: `${post.id}-${Math.random()}`,
+          source: { uri: post.image_url },
+          avatar: { uri: post.image_url },
+          user: post.title.rendered,
+          data: {
+            categories: post_categories,
+            post,
+          }
+        })
+      });
 
     return (
       <View style={{ height: "100%" }}>
@@ -273,7 +279,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 15,
     width: "100%",
-    backgroundColor: "#0F1010",
+    backgroundColor: "#000000",
     alignItems: "center",
     justifyContent: "space-around"
   },

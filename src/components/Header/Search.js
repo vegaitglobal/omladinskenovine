@@ -25,18 +25,13 @@ const Search = props => {
   return (
     <Container>
       <TextInput
+        placeholder={"Претрага"}
         autoFocus={true}
         onChangeText={setSearch}
         value={search}
         onBlur={onBlur}
         onSubmitEditing={handleSearch}
         returnKeyType={"search"}
-      />
-      <Button
-        style={{ backgroundColor: "#f25529" }}
-        color="#f25529"
-        title="Тражи"
-        onPress={handleSearch}
       />
     </Container>
   );
