@@ -1,3 +1,4 @@
+import { Linking } from "expo";
 import React, { Component } from "react";
 import {
   AsyncStorage,
@@ -72,6 +73,14 @@ export default class HomeScreen extends Component {
     });
   };
 
+  navigate = routeName => {
+    const { navigation } = this.props;
+
+    navigation.navigate({
+      routeName: routeName
+    });
+  };
+
   getPosts = async (prevPosts, pageNumber, pageSize) => {
     await fetch(
       `http://omladinskenovine.rs/wp-json/wp/v2/posts?page=${pageNumber}&per_page=${pageSize}`
@@ -81,6 +90,10 @@ export default class HomeScreen extends Component {
         this.setState({ posts: [...prevPosts, ...resp] }, async () => {
           const withImg = await Promise.all(
             resp.map(async post => {
+              post.title.rendered = post.title.rendered
+                .replace("&#8222;", "„")
+                .replace("&#8220;", '"')
+                .replace("&#8211;", "-");
               let id = post.featured_media;
               return await fetch(
                 `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
@@ -128,8 +141,8 @@ export default class HomeScreen extends Component {
     let categories = this.state.categories.filter(cat =>
       item.categories.includes(cat.id)
     );
-    const onReadMorePress = () =>
-      navigation.push("Post", { post: item });
+    const onReadMorePress = ({ post, categories }) =>
+      navigation.push("Post", { post, categories });
 
     return (
       <PostThumbnail
@@ -172,9 +185,19 @@ export default class HomeScreen extends Component {
           ></Image>
         </View>
         <View style={styles.buttonsBar}>
-          <HomeScreenNavButton>УСПЕШНИ МЛАДИ</HomeScreenNavButton>
-          <HomeScreenNavButton>О НАМА</HomeScreenNavButton>
-          <HomeScreenNavButton>КОНТАКТ</HomeScreenNavButton>
+          <HomeScreenNavButton
+            onPress={() =>
+              Linking.openURL("http://uspesnimladi.omladinskenovine.rs/")
+            }
+          >
+            УСПЕШНИ МЛАДИ
+          </HomeScreenNavButton>
+          <HomeScreenNavButton onPress={() => this.navigate("About")}>
+            О НАМА
+          </HomeScreenNavButton>
+          <HomeScreenNavButton onPress={() => this.navigate("Contact")}>
+            КОНТАКТ
+          </HomeScreenNavButton>
         </View>
         <View style={styles.posts}>
           <Carousel

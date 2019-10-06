@@ -1,3 +1,4 @@
+import { Linking } from "expo";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 import styled, { css } from "styled-components";
@@ -36,43 +37,80 @@ MenuItem.Underline = styled.View`
 MenuItem.Text = styled.Text`
   color: white;
   font-size: 18px;
-  font-family: 'Oswald';
+  font-family: "Oswald";
 `;
 
 const menuFactory = navigation => [
   {
-    label: "MENI",
+    label: "МЕНИ",
     children: [
       { label: "НАСЛОВНА СТРАНА", onPress: () => navigation.navigate("Home") },
-      { label: "ШКОЛСКИ КУТАК" },
-      { label: "УСПЕШНИ МЛАДИ" },      
-      { label: "БЛОГ" },
-      { label: "О НАМА" },
-      { label: "КОНТАКТ", onPress: () => navigation.navigate("Contact") },
+      {
+        label: "ШКОЛСКИ КУТАК",
+        onPress: () => navigation.push("PostList", { category_id: 517 })
+      },
+      {
+        label: "УСПЕШНИ МЛАДИ",
+        onPress: () =>
+          Linking.openURL("http://uspesnimladi.omladinskenovine.rs/")
+      },
+
+      { label: "О НАМА", onPress: () => navigation.navigate("About") },
+      { label: "КОНТАКТ", onPress: () => navigation.navigate("Contact") }
     ]
   },
   {
     label: "ВЕСТИ",
     children: [
-      { label: "Stipendije" },
-      { label: "Prakse" },
-      { label: "Konkursi" },
-      { label: "Zivot van faksa brt" },
+      {
+        label: "СТИПЕНДИЈЕ",
+        onPress: () => navigation.push("PostList", { category_id: 168 })
+      },
+      {
+        label: "ПРАКСЕ",
+        onPress: () => navigation.push("PostList", { category_id: 523 })
+      },
+      {
+        label: "КОНКУРСИ",
+        onPress: () => navigation.push("PostList", { category_id: 167 })
+      },
+      {
+        label: "ЖИВОТ ВАН ФАКСА",
+        onPress: () => navigation.push("PostList", { category_id: 522 })
+      }
     ]
   },
   {
     label: "МАГАЗИН",
+    onPress: () => navigation.push("PostList", { category_id: 518 }),
     children: [
-      { label: "Kultura" },
-      { label: "Price sa putovanja" },
-      { label: "Zanimljivosti" },
+      {
+        label: "КУЛТУРА",
+        onPress: () => navigation.push("PostList", { category_id: 6 })
+      },
+      {
+        label: "ПРИЧЕ СА ПУТОВАЊА",
+        onPress: () => navigation.push("PostList", { category_id: 166 })
+      },
+      {
+        label: "ЗАНИМЉИВОСТИ",
+        onPress: () => navigation.push("PostList", { category_id: 8 })
+      },
+      {
+        label: "БЛОГ",
+        onPress: () => navigation.push("PostList", { category_id: 1 })
+      }
     ]
-  },
+  }
 ];
 
 const renderMenu = (menuItem, i) => {
   return (
-    <TouchableOpacity key={i} onPress={menuItem.onPress} style={{ marginTop: menuItem.children && 15 }}>
+    <TouchableOpacity
+      key={i}
+      onPress={menuItem.onPress}
+      style={{ marginTop: menuItem.children && 15 }}
+    >
       <MenuItem>
         <MenuItem.Wrapper>
           <MenuItem.Underline underline={!!menuItem.children}>

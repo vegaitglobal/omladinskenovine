@@ -1,31 +1,45 @@
-import { View, Text, FlatList } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import qs from 'query-string';
+import qs from "query-string";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Text, View } from "react-native";
+import styled from "styled-components";
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
-const fetchPostsWithImages = async (url) => {
+const fetchPostsWithImages = async url => {
   const posts = await (await fetch(url)).json();
   const withImg = await Promise.all(
     posts.map(async (post, i) => {
+      post.title.rendered = post.title.rendered
+        .replace("&#8222;", "„")
+        .replace("&#8220;", '"')
+        .replace("&#8211;", "-");
       let id = post.featured_media;
-      let image = await (await fetch(`http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`)).json();
+      let image = await (await fetch(
+        `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
+      )).json();
       return {
         ...post,
-        imageUrl: image.media_details.sizes.full.source_url
-      }
+        image_url: image.media_details.sizes.full.source_url
+      };
     })
   );
 
   return withImg;
-}
+};
 
-const resolveCategories = async (categoryIds) => {
-  const categoryLink = "http://omladinskenovine.rs/wp-json/wp/v2/categories?per_page=100";
+const getAllCategoires = async () => {
+  const categoryLink =
+    "http://omladinskenovine.rs/wp-json/wp/v2/categories?per_page=100";
   const allCategories = await (await fetch(categoryLink)).json();
-  const categories = allCategories.filter(category => categoryIds.includes(category.id));
-  return categories.map(category => category.name).join(", ");
-}
+  return allCategories;
+};
+
+// const resolveCategories = async categoryIds => {
+//   const allCategories = getAllCategoires();
+//   const categories = allCategories.filter(category =>
+//     categoryIds.includes(category.id)
+//   );
+//   return categories.map(category => category.name).join(", ");
+// };
 
 const BackgroundImage = styled.Image`
   flex: 1;
@@ -52,70 +66,100 @@ const Overlay = styled.View`
 const PostDetails = styled.View``;
 
 const PostCategory = styled.Text`
-    font-family: "Oswald";
-    text-align: center;
-    font-size: 12;
-    color: #EE4528;
+  font-family: "Oswald";
+  text-align: center;
+  font-size: 12;
+  color: #ee4528;
 `;
 
 const PostTitle = styled.Text`
-    font-family: "RobotoSlab-Bold";
-    text-align: center;
-    padding: 10px 0;
-    font-size: 25px;
+  font-family: "RobotoSlab-Bold";
+  text-align: center;
+  padding: 10px 0;
+  font-size: 25px;
 `;
 
-const SingleListPost = ({ title: { rendered }, categories: categoryIds, imageUrl, handleOnPress }) => {
-  const [categories, setCategories] = useState("");
+const SingleListPost = ({
+  title: { rendered },
+  categories: categoryIds,
+  allCategories,
+  image_url,
+  handleOnPress
+}) => {
+  const [categoriesString, setCategoriesString] = useState("");
+  const [categories, setCategories] = useState([]);
 
-  const formattedTitle = rendered
-                          .replace("&#8222;", "„")
-                          .replace("&#8220;", '"');
+  const formattedTitle = rendered;
 
   useEffect(() => {
-    resolveCategories(categoryIds).then(setCategories)
+    //resolveCategories(categories).then(setCategories);
+    const filtered = allCategories.filter(category =>
+      categoryIds.includes(category.id)
+    );
+    setCategories(filtered);
+    setCategoriesString(filtered.map(c => c.name).join(", "));
   }, []);
 
   return (
-    <SinglePostWrapper onPress={handleOnPress}>
-      <BackgroundImage resizeMode="contain" source={{uri: imageUrl}} />
+    <SinglePostWrapper onPress={() => handleOnPress(categories)}>
+      <BackgroundImage resizeMode="contain" source={{ uri: image_url }} />
       <Overlay>
         <PostDetails>
-          <PostCategory>{categories}</PostCategory>
-          <PostTitle>{formattedTitle}</PostTitle> 
+          <PostCategory>{categoriesString}</PostCategory>
+          <PostTitle>{formattedTitle}</PostTitle>
         </PostDetails>
       </Overlay>
     </SinglePostWrapper>
-  )
-}
+  );
+};
 
-const PostListScreen = (props) => {
+const PostListScreen = props => {
   const { navigation } = props;
   const { category_id, search } = navigation.state.params;
 
   const query = qs.stringify({
-    'search': search,
-    'filter[cat]': category_id,
+    search: search,
+    categories: category_id
   });
 
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
 
-  const handleOnPress = (post) => navigation.push('Post', {post});
+  const handleOnPress = (post, categories) =>
+    navigation.push("Post", { post, categories });
+
   useEffect(() => {
     fetchPostsWithImages(url).then(setPosts);
+    getAllCategoires().then(setCategories);
   }, [navigation.state.params]);
-  
-  if (posts.length < 0 ) return <View><Text>Loading...</Text></View>
+
+  if (posts.length < 0)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
-    <View style={{ height: '100%' }}>
-      <FlatList data={posts} renderItem={({ item: post }) => <SingleListPost {...post} handleOnPress={() => handleOnPress(post)}/>} />
+    <View style={{ height: "100%" }}>
+      <ActivityIndicator
+        size="large"
+        style={{ top: "50%" }}
+        animating={!posts.length}
+      ></ActivityIndicator>
+      <FlatList
+        data={posts}
+        renderItem={({ item: post }) => (
+          <SingleListPost
+            {...post}
+            allCategories={categories}
+            handleOnPress={categories => handleOnPress(post, categories)}
+          />
+        )}
+      />
     </View>
-  )
-  
-  
-}
-
+  );
+};
 
 export default PostListScreen;

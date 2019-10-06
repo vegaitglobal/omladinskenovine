@@ -16,7 +16,7 @@ export default class PostThumbnail extends Component {
     const date = formatDate(item.date);
 
     const handleReadMorePress = () => {
-      onReadMorePress(item);
+      onReadMorePress({ post: item, categories: this.props.categories });
     };
 
     return (
