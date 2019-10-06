@@ -3,17 +3,13 @@ import React, { Component } from "react";
 import {
   AsyncStorage,
   Dimensions,
-  Image,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  View,
-  TextInput,
-  Button,
+  View
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
-import Story from 'react-native-story'
-
+import Story from "react-native-story";
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
 import PostThumbnail, { ReadMoreButton } from "../components/PostThumbnail";
 
@@ -32,81 +28,6 @@ const BOTTOM_ITEMS = [
   { label: "КУЛТУРА", value: 8 }
 ];
 
-// const stories = [
-//   {
-//     id: "4",
-//     source: require("../../assets/splash.png"),
-//     user: "Ugur Erdal",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "2",
-//     source: require("../../assets/splash.png"),
-//     user: "Mustafa",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "5",
-//     source: require("../../assets/splash.png"),
-//     user: "Emre Yilmaz",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "3",
-//     source: require("../../assets/splash.png"),
-//     user: "Cenk Gun",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "3456345634",
-//     source: require("../../assets/splash.png"),
-//     user: "Ugur Erdal",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "34645364",
-//     source: require("../../assets/splash.png"),
-//     user: "Mustafa",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "5",
-//     source: require("../../assets/splash.png"),
-//     user: "Emre Yilmaz",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "34564536",
-//     source: require("../../assets/splash.png"),
-//     user: "Cenk Gun",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "4356345636",
-//     source: require("../../assets/splash.png"),
-//     user: "Ugur Erdal",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "14234536",
-//     source: require("../../assets/splash.png"),
-//     user: "Mustafa",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "123123",
-//     source: require("../../assets/splash.png"),
-//     user: "Emre Yilmaz",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-//   {
-//     id: "123123",
-//     source: require("../../assets/splash.png"),
-//     user: "Cenk Gun",
-//     avatar: require("../../assets/icons/logo.jpg")
-//   },
-// ];
-
 export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -117,7 +38,7 @@ export default class HomeScreen extends Component {
       refreshing: false,
       connected: false,
       pageNumber: 1,
-      pageSize: 5,
+      pageSize: 5
     };
   }
 
@@ -263,27 +184,27 @@ export default class HomeScreen extends Component {
 
     const stories = posts
       .filter(post => post.image_url)
-      .map((post) => ({
+      .map(post => ({
         id: `${post.id}-${Math.random()}`,
         source: { uri: post.image_url },
         avatar: { uri: post.image_url },
         user: post.title.rendered,
         data: {
           post,
-          categories,
+          categories
         }
       }));
 
     return (
-      <View style={{ height: '100%' }}>
+      <View style={{ height: "100%" }}>
         <Story
           onStoryOpen={() => this.setState({ viewingStory: true })}
           onStoryClose={() => this.setState({ viewingStory: false })}
           unPressedBorderColor="#e95950"
           pressedBorderColor="#ebebeb"
           stories={stories}
-          onStoryPress={(story) => navigation.push("Post", story.data)}
-          footerComponent={(story) => (
+          onStoryPress={story => navigation.push("Post", story.data)}
+          footerComponent={story => (
             <ReadMoreButton
               style={{ marginBottom: 25 }}
               onPress={() => navigation.push("Post", story.data)}
@@ -300,13 +221,6 @@ export default class HomeScreen extends Component {
             />
           }
         >
-          {/* <View style={styles.logoContainer}>
-            <Image
-              style={styles.logo}
-              resizeMode="contain"
-              source={require("../../assets/icons/logo.jpg")}
-            ></Image>
-          </View> */}
           <View style={styles.buttonsBar}>
             {topItems.map((item, i) => (
               <HomeScreenNavButton key={i} onPress={item.onPress}>
@@ -336,7 +250,7 @@ export default class HomeScreen extends Component {
               </HomeScreenNavButton>
             ))}
           </View>
-      </ScrollView>
+        </ScrollView>
       </View>
     );
   }
