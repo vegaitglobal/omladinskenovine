@@ -1,8 +1,17 @@
-import { ActivityIndicator, View, Text, FlatList, AsyncStorage } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import qs from 'query-string';
-import { Image as CachedImage, CacheManager } from 'react-native-expo-image-cache';
+import qs from "query-string";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  AsyncStorage,
+  FlatList,
+  Text,
+  View
+} from "react-native";
+import {
+  CacheManager,
+  Image as CachedImage
+} from "react-native-expo-image-cache";
+import styled from "styled-components";
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async url => {
@@ -102,11 +111,9 @@ const SingleListPost = ({
     setCategoriesString(filtered.map(c => c.name).join(", "));
   }, []);
 
-
-  CacheManager
-    .get(image_url)
+  CacheManager.get(image_url)
     .getPath()
-    .then((url) => {
+    .then(url => {
       setImagePreview(url);
     });
 
@@ -116,7 +123,11 @@ const SingleListPost = ({
 
   return (
     <SinglePostWrapper onPress={() => handleOnPress(categories)}>
-      <BackgroundImage resizeMode="contain" preview={{ uri: imagePreview }} uri={image_url} />
+      <BackgroundImage
+        resizeMode="contain"
+        preview={{ uri: imagePreview }}
+        uri={image_url}
+      />
       <Overlay>
         <PostDetails>
           <PostCategory>{categoriesString}</PostCategory>
@@ -143,29 +154,31 @@ const PostListScreen = props => {
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
 
-  const handleOnPress = (post) => navigation.push('Post', {post});
-
   useEffect(() => {
     const getPosts = async () => {
       getAllCategoires().then(setCategories);
-      
+
       const cachedPosts = JSON.parse(await AsyncStorage.getItem(query));
 
       if (cachedPosts) {
-        return setPosts(cachedPosts)
+        return setPosts(cachedPosts);
       }
 
-      fetchPostsWithImages(url).then((posts) => {
+      fetchPostsWithImages(url).then(posts => {
         setPosts(posts);
         AsyncStorage.setItem(query, JSON.stringify(posts));
       });
     };
 
     getPosts();
-    
   }, [navigation.state.params]);
 
-  if (posts.length < 0 ) return <View><Text>Loading...</Text></View>
+  if (posts.length < 0)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
     <View style={{ height: "100%" }}>
