@@ -47,7 +47,11 @@ const menuFactory = navigation => [
       { label: "НАСЛОВНА СТРАНА", onPress: () => navigation.navigate("Home") },
       {
         label: "ШКОЛСКИ КУТАК",
-        onPress: () => navigation.push("PostList", { category_id: 517 })
+        onPress: () =>
+          navigation.push("PostList", {
+            category_id: 517,
+            label: "ШКОЛСКИ КУТАК"
+          })
       },
       {
         label: "УСПЕШНИ МЛАДИ",
@@ -64,41 +68,56 @@ const menuFactory = navigation => [
     children: [
       {
         label: "СТИПЕНДИЈЕ",
-        onPress: () => navigation.push("PostList", { category_id: 168 })
+        onPress: () =>
+          navigation.push("PostList", { category_id: 168, label: "СТИПЕНДИЈЕ" })
       },
       {
         label: "ПРАКСЕ",
-        onPress: () => navigation.push("PostList", { category_id: 523 })
+        onPress: () =>
+          navigation.push("PostList", { category_id: 523, label: "ПРАКСЕ" })
       },
       {
         label: "КОНКУРСИ",
-        onPress: () => navigation.push("PostList", { category_id: 167 })
+        onPress: () =>
+          navigation.push("PostList", { category_id: 167, label: "КОНКУРСИ" })
       },
       {
         label: "ЖИВОТ ВАН ФАКСА",
-        onPress: () => navigation.push("PostList", { category_id: 522 })
+        onPress: () =>
+          navigation.push("PostList", {
+            category_id: 522,
+            label: "ЖИВОТ ВАН ФАКСА"
+          })
       }
     ]
   },
   {
     label: "МАГАЗИН",
-    onPress: () => navigation.push("PostList", { category_id: 518 }),
+    onPress: () =>
+      navigation.push("PostList", { category_id: 518, label: "МАГАЗИН" }),
     children: [
       {
         label: "КУЛТУРА",
-        onPress: () => navigation.push("PostList", { category_id: 6 })
+        onPress: () =>
+          navigation.push("PostList", { category_id: 6, label: "КУЛТУРА" })
       },
       {
         label: "ПРИЧЕ СА ПУТОВАЊА",
-        onPress: () => navigation.push("PostList", { category_id: 166 })
+        onPress: () =>
+          navigation.push("PostList", {
+            category_id: 166,
+            label: "ПРИЧЕ СА ПУТОВАЊА"
+          })
       },
       {
         label: "ЗАНИМЉИВОСТИ",
-        onPress: () => navigation.push("PostList", { category_id: 8 })
+        onPress: () =>
+          navigation.push("PostList", { category_id: 8, label: "ЗАНИМЉИВОСТИ" })
       },
       {
         label: "БЛОГ",
-        onPress: () => navigation.push("PostList", { category_id: 1 })
+        onPress: () =>
+          navigation.push("PostList", { category_id: 1, label: "БЛОГ" })
       }
     ]
   }
