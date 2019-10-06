@@ -2,34 +2,37 @@ import React from "react";
 import {
   ImageBackground,
   ScrollView,
-  StyleSheet,
   Text,
-  View
+  Dimensions
 } from "react-native";
-import HTMLView from "react-native-htmlview";
 import styled from "styled-components";
 import { formatDate } from "../utils/Utils";
-
-const styles = StyleSheet.create({
-  a: {
-    fontWeight: "300",
-    color: "#FF3366" // make links coloured pink
-  }
-});
+import HTML from "react-native-render-html";
 
 const variables = {
   colors: {
-    primary: "orange",
-    text: "black"
+    primary: "#f25529",
+    text: "#000",
+    textSecondary: "#888888"
   }
 };
 
-const FeaturedImage = styled(View)`
+const FeaturedImageArea = styled.View`
   width: 100%;
   height: 200;
 `;
-const Content = styled(View)`
-  padding: 3% 4% 20% 4%;
+
+const Date = ({ date }) => {
+  return (
+    <Text style={{ color: variables.colors.textSecondary, paddingBottom: 20 }}>
+      {formatDate(date)}
+    </Text>
+  );
+};
+const Content = styled.View`
+  padding: 15px;
+  flex: 1;
+  flex-direction: column;
 `;
 
 const Category = styled(Text)`
@@ -64,34 +67,46 @@ const PostScreen = props => {
   const { navigation } = props;
   const { post, categories } = navigation.state.params;
 
-  if (post === null) {
-    return <Text>Loading...</Text>;
-  }
-
   return (
     <ScrollView style={{ flex: 1, paddingBottom: 20 }}>
-      <FeaturedImage>
+      <FeaturedImageArea>
         <ImageBackground
           style={{ width: "100%", height: "100%" }}
           source={{
             uri: post.image_url
           }}
         ></ImageBackground>
-      </FeaturedImage>
-
+      </FeaturedImageArea>
       <Content>
         <Title size={1}>{post.title.rendered}</Title>
         <Category>{categories.map(c => c.name).join(", ")}</Category>
+        <Date date={post.date}></Date>
 
-        <Text style={{ marginBottom: 5 }}>{formatDate(post.date)}</Text>
-        <HTMLView value={post.content.rendered} stylesheet={styles} />
+        <HTML
+          html={post.content.rendered}
+          baseFontStyle={{ fontSize: 14 }}
+          tagsStyles={{
+            p: { textAlign: "justify" },
+            img: {
+              width: Dimensions.get("window").width - 30,
+              height: 200,
+              marginTop: 10,
+              marginBottom: 10
+            },
+            iframe: {
+              maxWidth: "100%",
+              marginTop: 10
+            }
+          }}
+          classesStyles={{ "wp-caption-text": { maxWidth: "100%" } }}
+          imagesInitialDimensions={{
+            width: Dimensions.get("window").width - 30,
+            height: 200
+          }}
+        />
       </Content>
     </ScrollView>
   );
-};
-
-PostScreen.defaultProps = {
-  post: null
 };
 
 export default PostScreen;

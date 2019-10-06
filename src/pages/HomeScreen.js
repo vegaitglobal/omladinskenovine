@@ -78,7 +78,8 @@ export default class HomeScreen extends Component {
     const { navigation } = this.props;
 
     navigation.push("PostList", {
-      category_id: categoryItem.value
+      category_id: categoryItem.value,
+      label: categoryItem.label
     });
   };
 

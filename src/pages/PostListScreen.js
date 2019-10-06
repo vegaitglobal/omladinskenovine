@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   AsyncStorage,
   FlatList,
+  StyleSheet,
   Text,
   View
 } from "react-native";
@@ -16,7 +17,7 @@ import styled from "styled-components";
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async url => {
   const posts = await (await fetch(url)).json();
-  const withImg = await Promise.all(
+  const withImg = (await Promise.all(
     posts.map(async (post, i) => {
       post.title.rendered = post.title.rendered
         .replace("&#8222;", "„")
@@ -26,12 +27,17 @@ const fetchPostsWithImages = async url => {
       let image = await (await fetch(
         `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
       )).json();
+
+      if (image.data && image.data.status > 400) {
+        return null;
+      }
+
       return {
         ...post,
         image_url: image.media_details.sizes.full.source_url
       };
     })
-  );
+  )).filter(x => x !== null);
 
   return withImg;
 };
@@ -64,6 +70,7 @@ const SinglePostWrapper = styled.TouchableOpacity`
   align-items: center;
   padding: 0 5% 0 5%;
   justify-content: center;
+  margin-bottom: 20px;
 `;
 
 const Overlay = styled.View`
@@ -117,14 +124,10 @@ const SingleListPost = ({
       setImagePreview(url);
     });
 
-  if (!imagePreview) {
-    return null;
-  }
-
   return (
     <SinglePostWrapper onPress={() => handleOnPress(categories)}>
       <BackgroundImage
-        resizeMode="contain"
+        resizeMode="cover"
         preview={{ uri: imagePreview }}
         uri={image_url}
       />
@@ -140,7 +143,7 @@ const SingleListPost = ({
 
 const PostListScreen = props => {
   const { navigation } = props;
-  const { category_id, search } = navigation.state.params;
+  const { category_id, search, label } = navigation.state.params;
 
   const query = qs.stringify({
     search: search,
@@ -148,8 +151,8 @@ const PostListScreen = props => {
   });
 
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
-  const [posts, setPosts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [posts, setPosts] = useState(null);
+  const [categories, setCategories] = useState(null);
 
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
@@ -173,32 +176,58 @@ const PostListScreen = props => {
     getPosts();
   }, [navigation.state.params]);
 
-  if (posts.length < 0)
+  const isLoading = !posts;
+
+  if (isLoading) {
     return (
-      <View>
-        <Text>Loading...</Text>
+      <View style={styles.container}>
+        <ActivityIndicator
+          size="large"
+          style={{ top: "50%" }}
+          animating={true}
+        />
       </View>
     );
+  }
 
   return (
-    <View style={{ height: "100%" }}>
-      <ActivityIndicator
-        size="large"
-        style={{ top: "50%" }}
-        animating={!posts.length}
-      ></ActivityIndicator>
-      <FlatList
-        data={posts}
-        renderItem={({ item: post }) => (
-          <SingleListPost
-            {...post}
-            allCategories={categories}
-            handleOnPress={categories => handleOnPress(post, categories)}
-          />
-        )}
-      />
+    <View style={styles.container}>
+      <View style={styles.title}>
+        <Text style={styles.titleText}>{label}</Text>
+      </View>
+      <View>
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => `${item.id}` }
+          renderItem={({ item: post }) => (
+            <SingleListPost
+              {...post}
+              allCategories={categories || []}
+              handleOnPress={categories => handleOnPress(post, categories)}
+            />
+          )}
+        />
+      </View>
     </View>
   );
 };
 
 export default PostListScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  title: {
+    paddingHorizontal: 15,
+    marginVertical: 10,
+    backgroundColor: "#000000"
+  },
+  titleText: {
+    color: "#FFFFFF",
+    fontSize: 30,
+    fontFamily: "RobotoSlab-Bold"
+  }
+});
