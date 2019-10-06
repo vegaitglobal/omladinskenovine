@@ -1,6 +1,5 @@
 import React from "react";
 import {
-  View,
   ImageBackground,
   ScrollView,
   Text,
@@ -66,7 +65,7 @@ const Title = props => {
 
 const PostScreen = props => {
   const { navigation } = props;
-  const { post } = navigation.state.params;
+  const { post, categories } = navigation.state.params;
 
   return (
     <ScrollView style={{ flex: 1, paddingBottom: 20 }}>
@@ -80,7 +79,7 @@ const PostScreen = props => {
       </FeaturedImageArea>
       <Content>
         <Title size={1}>{post.title.rendered}</Title>
-        <Category>Categories...</Category>
+        <Category>{categories.map(c => c.name).join(", ")}</Category>
         <Date date={post.date}></Date>
 
         <HTML

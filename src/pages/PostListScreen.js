@@ -1,19 +1,62 @@
-import { View, Text, ScrollView } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import qs from "query-string";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  AsyncStorage,
+  FlatList,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
+import {
+  CacheManager,
+  Image as CachedImage
+} from "react-native-expo-image-cache";
+import styled from "styled-components";
 
-const fetchPosts = async (url) => await (await fetch(url)).json();
+// const fetchPosts = async (url) => await (await fetch(url)).json();
+const fetchPostsWithImages = async url => {
+  const posts = await (await fetch(url)).json();
+  const withImg = await Promise.all(
+    posts.map(async (post, i) => {
+      post.title.rendered = post.title.rendered
+        .replace("&#8222;", "„")
+        .replace("&#8220;", '"')
+        .replace("&#8211;", "-");
+      let id = post.featured_media;
+      let image = await (await fetch(
+        `http://omladinskenovine.rs/wp-json/wp/v2/media/${id}`
+      )).json();
+      return {
+        ...post,
+        image_url: image.media_details.sizes.full.source_url
+      };
+    })
+  );
 
-const BackgroundImage = styled.Image`
+  return withImg;
+};
+
+const getAllCategoires = async () => {
+  const categoryLink =
+    "http://omladinskenovine.rs/wp-json/wp/v2/categories?per_page=100";
+  const allCategories = await (await fetch(categoryLink)).json();
+  return allCategories;
+};
+
+// const resolveCategories = async categoryIds => {
+//   const allCategories = getAllCategoires();
+//   const categories = allCategories.filter(category =>
+//     categoryIds.includes(category.id)
+//   );
+//   return categories.map(category => category.name).join(", ");
+// };
+
+const BackgroundImage = styled(CachedImage)`
   flex: 1;
   aspect-ratio: 1;
   width: 100%;
 `;
-
-const PostListWrapper = styled.FlatList`
-
-`;
-
 
 const SinglePostWrapper = styled.TouchableOpacity`
   position: relative;
@@ -26,48 +69,155 @@ const SinglePostWrapper = styled.TouchableOpacity`
 
 const Overlay = styled.View`
   position: absolute;
-  background-color: rgba(255, 255, 255, 0.4);
-  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.85);
+  width: 95%;
+  padding: 30px 10px;
 `;
 
-const PostDetails = styled.View`
-  
+const PostDetails = styled.View``;
+
+const PostCategory = styled.Text`
+  font-family: "Oswald";
+  text-align: center;
+  font-size: 12;
+  color: #ee4528;
 `;
 
-const SingleListPost = ({ title }) => {
+const PostTitle = styled.Text`
+  font-family: "RobotoSlab-Bold";
+  text-align: center;
+  padding: 10px 0;
+  font-size: 25px;
+`;
+
+const SingleListPost = ({
+  title: { rendered },
+  categories: categoryIds,
+  allCategories,
+  image_url,
+  handleOnPress
+}) => {
+  const [categoriesString, setCategoriesString] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [imagePreview, setImagePreview] = useState(null);
+
+  const formattedTitle = rendered;
+
+  useEffect(() => {
+    //resolveCategories(categories).then(setCategories);
+    const filtered = allCategories.filter(category =>
+      categoryIds.includes(category.id)
+    );
+    setCategories(filtered);
+    setCategoriesString(filtered.map(c => c.name).join(", "));
+  }, []);
+
+  CacheManager.get(image_url)
+    .getPath()
+    .then(url => {
+      setImagePreview(url);
+    });
+
   return (
-    <SinglePostWrapper>
-      <BackgroundImage resizeMode="contain" source={{uri: 'http://lorempixel.com/output/abstract-q-c-640-480-1.jpg'}} />
+    <SinglePostWrapper onPress={() => handleOnPress(categories)}>
+      <BackgroundImage
+        resizeMode="contain"
+        preview={{ uri: imagePreview }}
+        uri={image_url}
+      />
       <Overlay>
         <PostDetails>
-          <Text>{title.rendered}</Text> 
+          <PostCategory>{categoriesString}</PostCategory>
+          <PostTitle>{formattedTitle}</PostTitle>
         </PostDetails>
       </Overlay>
     </SinglePostWrapper>
-  )
-}
+  );
+};
 
-const PostListScreen = (props) => {
+const PostListScreen = props => {
   const { navigation } = props;
-  const { category_id } = navigation.state.params;
+  const { category_id, search, label } = navigation.state.params;
 
-  const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?filter[cat]=${category_id}`;
+  const query = qs.stringify({
+    search: search,
+    categories: category_id
+  });
+
+  const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
   const [posts, setPosts] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  const handleOnPress = (post, categories) =>
+    navigation.push("Post", { post, categories });
 
   useEffect(() => {
-    fetchPosts(url).then(setPosts)
-  }, []);
-  
-  if (posts.length < 0 ) return <View><Text>HOooe</Text></View>
+    const getPosts = async () => {
+      getAllCategoires().then(setCategories);
+
+      const cachedPosts = JSON.parse(await AsyncStorage.getItem(query));
+
+      if (cachedPosts) {
+        return setPosts(cachedPosts);
+      }
+
+      fetchPostsWithImages(url).then(posts => {
+        setPosts(posts);
+        AsyncStorage.setItem(query, JSON.stringify(posts));
+      });
+    };
+
+    getPosts();
+  }, [navigation.state.params]);
+
+  if (posts.length < 0)
+    return (
+      <View>
+        <Text>Loading...</Text>
+      </View>
+    );
 
   return (
-    <View style={{ height: '100%' }}>
-      <PostListWrapper data={posts} renderItem={({ item: post }) => <SingleListPost {...post} />} />
+    <View style={styles.container}>
+      <ActivityIndicator
+        size="large"
+        style={{ top: "50%" }}
+        animating={!posts.length}
+      ></ActivityIndicator>
+      <View style={styles.title}>
+        <Text style={styles.titleText}>{label}</Text>
+      </View>
+      <FlatList
+        data={posts}
+        keyExtractor={(item) => `${item.id}` }
+        renderItem={({ item: post }) => (
+          <SingleListPost
+            {...post}
+            allCategories={categories}
+            handleOnPress={categories => handleOnPress(post, categories)}
+          />
+        )}
+      />
     </View>
-  )
-  
-  
-}
-
+  );
+};
 
 export default PostListScreen;
+
+const styles = StyleSheet.create({
+  container: {
+    height: "100%",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  title: {
+    paddingHorizontal: 15,
+    backgroundColor: "#000000"
+  },
+  titleText: {
+    color: "#FFFFFF",
+    fontSize: 30,
+    fontFamily: "RobotoSlab-Bold"
+  }
+});
