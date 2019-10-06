@@ -110,10 +110,6 @@ const SingleListPost = ({
       setImagePreview(url);
     });
 
-  if (!imagePreview) {
-    return null;
-  }
-
   return (
     <SinglePostWrapper onPress={() => handleOnPress(categories)}>
       <BackgroundImage resizeMode="contain" preview={{ uri: imagePreview }} uri={image_url} />
@@ -142,8 +138,6 @@ const PostListScreen = props => {
 
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
-
-  const handleOnPress = (post) => navigation.push('Post', {post});
 
   useEffect(() => {
     const getPosts = async () => {
@@ -176,6 +170,7 @@ const PostListScreen = props => {
       ></ActivityIndicator>
       <FlatList
         data={posts}
+        keyExtractor={(item) => `${item.id}` }
         renderItem={({ item: post }) => (
           <SingleListPost
             {...post}
