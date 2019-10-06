@@ -4,9 +4,7 @@ import {
   ImageBackground,
   ScrollView,
   Text,
-  StyleSheet,
-  Dimensions,
-  Image
+  Dimensions
 } from "react-native";
 import styled from "styled-components";
 import { formatDate } from "../utils/Utils";
