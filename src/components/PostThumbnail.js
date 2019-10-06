@@ -67,6 +67,7 @@ const styles = StyleSheet.create({
   categories: {
     fontFamily: "Oswald",
     color: "#EE4528",
+    textAlign: "center",
     fontSize: 12
   },
   date: {

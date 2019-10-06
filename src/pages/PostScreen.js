@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  ImageBackground,
-  ScrollView,
-  Text,
-  Dimensions
-} from "react-native";
+import { ImageBackground, ScrollView, Text, Dimensions } from "react-native";
 import styled from "styled-components";
 import { formatDate } from "../utils/Utils";
 import HTML from "react-native-render-html";
@@ -24,7 +19,13 @@ const FeaturedImageArea = styled.View`
 
 const Date = ({ date }) => {
   return (
-    <Text style={{ color: variables.colors.textSecondary, paddingBottom: 20 }}>
+    <Text
+      style={{
+        color: variables.colors.textSecondary,
+        fontSize: 10,
+        paddingBottom: 20
+      }}
+    >
       {formatDate(date)}
     </Text>
   );
@@ -37,7 +38,9 @@ const Content = styled.View`
 
 const Category = styled(Text)`
   color: ${variables.colors.primary};
+  font-size: 10px;
   text-transform: uppercase;
+  margin-bottom: 2;
 `;
 
 const Title = props => {
@@ -57,7 +60,14 @@ const Title = props => {
   };
 
   return (
-    <Text style={{ fontSize: findTitleSize(props.size), paddingBottom: 2 }}>
+    <Text
+      style={{
+        fontSize: findTitleSize(props.size),
+        paddingBottom: 2,
+        fontFamily: "RobotoSlab-Bold",
+        lineHeight: 30
+      }}
+    >
       {props.children}
     </Text>
   );
