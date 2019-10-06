@@ -118,10 +118,6 @@ const SingleListPost = ({
       setImagePreview(url);
     });
 
-  if (!imagePreview) {
-    return null;
-  }
-
   return (
     <SinglePostWrapper onPress={() => handleOnPress(categories)}>
       <BackgroundImage
@@ -193,7 +189,7 @@ const PostListScreen = props => {
       </View>
       <FlatList
         data={posts}
-        keyExtractor={item => `${item.id}`}
+        keyExtractor={(item) => `${item.id}` }
         renderItem={({ item: post }) => (
           <SingleListPost
             {...post}
