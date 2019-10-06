@@ -1,17 +1,32 @@
 diff --git a/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js b/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js
-index daf7a10..72cd7aa 100644
+index daf7a10..fbe059e 100644
 --- a/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js
 +++ b/node_modules/react-native-story/src/components/avatar/view/avatarStyles.js
-@@ -14,6 +14,7 @@ export default StyleSheet.create({
+@@ -1,10 +1,11 @@
+ import { StyleSheet } from "react-native";
++import { Dimensions } from 'react-native';
+ 
+ export default StyleSheet.create({
+   container: {
+     flexDirection: "row",
+     padding: 16,
+-    alignItems: "center"
++    alignItems: "center",
+   },
+   avatar: {
+     width: 36,
+@@ -14,6 +15,8 @@ export default StyleSheet.create({
    },
    username: {
      color: "white",
+-    fontSize: 16
 +    fontFamily: 'Oswald',
-     fontSize: 16
++    fontSize: 16,
++    width: Dimensions.get("window").width - 69,
    }
  });
 diff --git a/node_modules/react-native-story/src/components/stories/view/storiesView.js b/node_modules/react-native-story/src/components/stories/view/storiesView.js
-index 1f0beae..3e95e46 100644
+index 1f0beae..aea95c2 100644
 --- a/node_modules/react-native-story/src/components/stories/view/storiesView.js
 +++ b/node_modules/react-native-story/src/components/stories/view/storiesView.js
 @@ -83,7 +83,7 @@ export default class Stories extends PureComponent {
@@ -23,6 +38,19 @@ index 1f0beae..3e95e46 100644
  
      return (
        <View style={styles.container}>
+@@ -94,10 +94,10 @@ export default class Stories extends PureComponent {
+               zIndex: 9999,
+               justifyContent: "center",
+               alignItems: "center",
+-              backgroundColor: "white"
++              backgroundColor: "black"
+             }}
+           >
+-            <ActivityIndicator size="large" color="gray" />
++            <ActivityIndicator size="large" color="white" />
+           </View>
+         )}
+         {stories
 @@ -111,6 +111,7 @@ export default class Stories extends PureComponent {
                  footerComponent={footerComponent}
                  handleSelectedStoryOnLoaded={this._handleSelectedStoryOnLoaded}
@@ -43,15 +71,6 @@ index 1f0beae..3e95e46 100644
            showsHorizontalScrollIndicator={false}
            scrollEventThrottle={16}
            snapToInterval={width}
-@@ -133,7 +137,7 @@ export default class Stories extends PureComponent {
-             ],
-             { useNativeDriver: true }
-           )}
--          decelerationRate={0.99}
-+          decelerationRate={0.5}
-           horizontal
-         />
-       </View>
 diff --git a/node_modules/react-native-story/src/components/story/view/storyStyles.js b/node_modules/react-native-story/src/components/story/view/storyStyles.js
 index 24821ea..6d164ac 100644
 --- a/node_modules/react-native-story/src/components/story/view/storyStyles.js
