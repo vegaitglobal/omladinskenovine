@@ -73,6 +73,8 @@ const Overlay = styled.View`
   background-color: rgba(255, 255, 255, 0.85);
   width: 95%;
   padding: 30px 10px;
+  flex-direction: row;
+  justify-content: center;
 `;
 
 const PostDetails = styled.View``;
@@ -167,9 +169,9 @@ const SkeletonCard = () => (
         primaryColor="#f9f9f9"
         secondaryColor="#dddbdb"
       >
-        <Rect x="110" y="34" rx="3" ry="3" width="68" height="6" />
-        <Rect x="44" y="57" rx="3" ry="3" width="244" height="14" />
-        <Rect x="44" y="79" rx="3" ry="3" width="240" height="14" />
+        <Rect x="88" y="34" rx="3" ry="3" width="68" height="6" />
+        <Rect x="0" y="57" rx="3" ry="3" width="244" height="14" />
+        <Rect x="0" y="79" rx="3" ry="3" width="240" height="14" />
       </ContentLoader>
     </Overlay>
   </SkeletonWrapper>
