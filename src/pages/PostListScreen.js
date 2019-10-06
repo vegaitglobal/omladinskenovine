@@ -1,20 +1,13 @@
 import qs from "query-string";
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  AsyncStorage,
-  FlatList,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View
-} from "react-native";
+import ContentLoader, { Rect } from "react-content-loader/native";
+import { AsyncStorage, FlatList, StyleSheet, Text, View } from "react-native";
 import {
   CacheManager,
   Image as CachedImage
 } from "react-native-expo-image-cache";
-import ContentLoader, { Rect } from "react-content-loader/native";
 import styled from "styled-components";
+import { formatDate } from "../utils/Utils";
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async url => {
@@ -91,6 +84,12 @@ const PostCategory = styled.Text`
   color: #ee4528;
 `;
 
+const PostDate = styled.Text`
+  font-family: "Oswald";
+  text-align: center;
+  font-size: 12;
+`;
+
 const PostTitle = styled.Text`
   font-family: "RobotoSlab-Bold";
   text-align: center;
@@ -101,6 +100,7 @@ const PostTitle = styled.Text`
 const SingleListPost = ({
   title: { rendered },
   categories: categoryIds,
+  date,
   allCategories,
   image_url,
   handleOnPress
@@ -135,8 +135,9 @@ const SingleListPost = ({
       />
       <Overlay>
         <PostDetails>
-          <PostCategory>{categoriesString}</PostCategory>
-          <PostTitle>{formattedTitle}</PostTitle>
+          <PostCategory>{categoriesString.toUpperCase()}</PostCategory>
+          <PostDate>{formatDate(date)}</PostDate>
+          <PostTitle>{formattedTitle.toUpperCase()}</PostTitle>
         </PostDetails>
       </Overlay>
     </SinglePostWrapper>
