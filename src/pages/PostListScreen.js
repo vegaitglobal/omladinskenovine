@@ -143,8 +143,6 @@ const PostListScreen = props => {
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
 
-  const handleOnPress = (post) => navigation.push('Post', {post});
-
   useEffect(() => {
     const getPosts = async () => {
       getAllCategoires().then(setCategories);

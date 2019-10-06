@@ -1,4 +1,3 @@
-import { Linking } from "expo";
 import React, { Component } from "react";
 import {
   AsyncStorage,
