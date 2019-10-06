@@ -1,19 +1,12 @@
 import { Linking } from "expo";
 import React, { Component } from "react";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Icon } from "react-native-elements";
-import email from "react-native-email";
+import { Image, ScrollView, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default class ContactScreen extends Component {
-  sendMail = () => {
-    const to = ["urednik@omladinskenovine.rs"];
-    email(to);
-  };
+  sendMail = () => Linking.openURL(`mailto:urednik@omladinskenovine.rs`);
 
-  call = () => {
-    const number = `tel:+381637711765`;
-    Linking.openURL(number);
-  };
+  call = () => Linking.openURL(`tel:+381637711765`);
 
   render() {
     return (
@@ -41,8 +34,12 @@ export default class ContactScreen extends Component {
           </View>
         </View>
         <View style={styles.icons}>
-          <Icon name="email" size={50} onPress={this.sendMail}></Icon>
-          <Icon name="call" size={50} onPress={this.call}></Icon>
+          <TouchableOpacity onPress={this.sendMail}>
+            <MaterialIcons name="email" size={50} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={this.call}>
+            <MaterialIcons name="call" size={50} />
+          </TouchableOpacity>
         </View>
       </ScrollView>
     );
