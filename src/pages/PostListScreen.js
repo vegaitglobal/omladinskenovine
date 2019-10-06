@@ -4,6 +4,7 @@ import {
   ActivityIndicator,
   AsyncStorage,
   FlatList,
+  SafeAreaView,
   StyleSheet,
   Text,
   View
@@ -12,6 +13,7 @@ import {
   CacheManager,
   Image as CachedImage
 } from "react-native-expo-image-cache";
+import ContentLoader, { Rect } from "react-content-loader/native";
 import styled from "styled-components";
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
@@ -141,6 +143,37 @@ const SingleListPost = ({
   );
 };
 
+const SkeletonWrapper = styled(View)`
+  position: relative;
+  width: 90%;
+  height: 310;
+  display: flex;
+  background-color: #f2f2f2;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 5% 20px 5%;
+  justify-content: center;
+`;
+
+// Loader
+const SkeletonCard = () => (
+  <SkeletonWrapper>
+    <Overlay>
+      <ContentLoader
+        height={120}
+        width={240}
+        speed={1}
+        primaryColor="#f9f9f9"
+        secondaryColor="#dddbdb"
+      >
+        <Rect x="110" y="34" rx="3" ry="3" width="68" height="6" />
+        <Rect x="44" y="57" rx="3" ry="3" width="244" height="14" />
+        <Rect x="44" y="79" rx="3" ry="3" width="240" height="14" />
+      </ContentLoader>
+    </Overlay>
+  </SkeletonWrapper>
+);
+
 const PostListScreen = props => {
   const { navigation } = props;
   const { category_id, search, label } = navigation.state.params;
@@ -181,11 +214,17 @@ const PostListScreen = props => {
   if (isLoading) {
     return (
       <View style={styles.container}>
-        <ActivityIndicator
-          size="large"
-          style={{ top: "50%" }}
-          animating={true}
-        />
+        <View style={styles.title}>
+          <Text style={styles.titleText}>{label}</Text>
+        </View>
+
+        <View style={{ alignSelf: "stretch" }}>
+          <FlatList
+            data={[1, 2, 3, 4]}
+            keyExtractor={item => item}
+            renderItem={() => <SkeletonCard />}
+          ></FlatList>
+        </View>
       </View>
     );
   }
@@ -198,7 +237,7 @@ const PostListScreen = props => {
       <View>
         <FlatList
           data={posts}
-          keyExtractor={(item) => `${item.id}` }
+          keyExtractor={item => `${item.id}`}
           renderItem={({ item: post }) => (
             <SingleListPost
               {...post}
@@ -216,9 +255,9 @@ export default PostListScreen;
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    flexDirection: 'column',
-    alignItems: 'center',
+    width: "100%",
+    flexDirection: "column",
+    alignItems: "center"
   },
   title: {
     paddingHorizontal: 15,
