@@ -12,7 +12,6 @@ import {
 import Carousel from "react-native-snap-carousel";
 import HomeScreenNavButton from "../components/HomeScreenNavButton";
 import PostThumbnail from "../components/PostThumbnail";
-import { Linking } from "expo";
 
 const topItemsFactory = (navigation) => ([
   { label: "УСПЕШНИ МЛАДИ", onPress: () => Linking.openURL('http://uspesnimladi.omladinskenovine.rs/') },
