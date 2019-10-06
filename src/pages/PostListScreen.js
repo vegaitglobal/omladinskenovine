@@ -1,7 +1,8 @@
-import qs from "query-string";
-import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Text, View } from "react-native";
-import styled from "styled-components";
+import { ActivityIndicator, View, Text, FlatList, AsyncStorage } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
+import qs from 'query-string';
+import { Image as CachedImage, CacheManager } from 'react-native-expo-image-cache';
 
 // const fetchPosts = async (url) => await (await fetch(url)).json();
 const fetchPostsWithImages = async url => {
@@ -41,7 +42,7 @@ const getAllCategoires = async () => {
 //   return categories.map(category => category.name).join(", ");
 // };
 
-const BackgroundImage = styled.Image`
+const BackgroundImage = styled(CachedImage)`
   flex: 1;
   aspect-ratio: 1;
   width: 100%;
@@ -88,6 +89,7 @@ const SingleListPost = ({
 }) => {
   const [categoriesString, setCategoriesString] = useState("");
   const [categories, setCategories] = useState([]);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const formattedTitle = rendered;
 
@@ -100,9 +102,21 @@ const SingleListPost = ({
     setCategoriesString(filtered.map(c => c.name).join(", "));
   }, []);
 
+
+  CacheManager
+    .get(image_url)
+    .getPath()
+    .then((url) => {
+      setImagePreview(url);
+    });
+
+  if (!imagePreview) {
+    return null;
+  }
+
   return (
     <SinglePostWrapper onPress={() => handleOnPress(categories)}>
-      <BackgroundImage resizeMode="contain" source={{ uri: image_url }} />
+      <BackgroundImage resizeMode="contain" preview={{ uri: imagePreview }} uri={image_url} />
       <Overlay>
         <PostDetails>
           <PostCategory>{categoriesString}</PostCategory>
@@ -129,17 +143,29 @@ const PostListScreen = props => {
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
 
+  const handleOnPress = (post) => navigation.push('Post', {post});
+
   useEffect(() => {
-    fetchPostsWithImages(url).then(setPosts);
-    getAllCategoires().then(setCategories);
+    const getPosts = async () => {
+      getAllCategoires().then(setCategories);
+      
+      const cachedPosts = JSON.parse(await AsyncStorage.getItem(query));
+
+      if (cachedPosts) {
+        return setPosts(cachedPosts)
+      }
+
+      fetchPostsWithImages(url).then((posts) => {
+        setPosts(posts);
+        AsyncStorage.setItem(query, JSON.stringify(posts));
+      });
+    };
+
+    getPosts();
+    
   }, [navigation.state.params]);
 
-  if (posts.length < 0)
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
+  if (posts.length < 0 ) return <View><Text>Loading...</Text></View>
 
   return (
     <View style={{ height: "100%" }}>

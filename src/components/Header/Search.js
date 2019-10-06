@@ -28,6 +28,8 @@ const Search = (props) => {
         autoFocus={true}
         onChangeText={setSearch}
         value={search}
+        onSubmitEditing={handleSearch}
+        returnKeyType={"search"}
       />
       <Button
         title="Pretraga"
