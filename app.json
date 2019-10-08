@@ -4,6 +4,9 @@
     "slug": "OmladinskeNovineApp",
     "privacy": "public",
     "sdkVersion": "35.0.0",
+    "android": {
+      "package": "com.omladinskenovine.mobileapp"
+    },
     "platforms": [
       "ios",
       "android",
@@ -25,7 +28,8 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "iosDisplayInForeground": true
-    }
+      "bundleIdentifier": "com.omladinskenovine.mobileapp"
+    },
+    "description": ""
   }
 }

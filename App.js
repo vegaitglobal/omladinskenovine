@@ -20,7 +20,7 @@ class App extends Component {
     NetInfo.addEventListener(state => {
       this.setState({ isConnected: state.isConnected });
       if (!state.isConnected) {
-        Toast.show(INTERNET_CONNECTION_ISSUE_MESSAGE);
+        Toast.show(INTERNET_CONNECTION_ISSUE_MESSAGE, {backgroundColor: "red", p});
       }
     });
   }

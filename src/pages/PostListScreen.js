@@ -1,7 +1,14 @@
 import qs from "query-string";
 import React, { useEffect, useState } from "react";
 import ContentLoader, { Rect } from "react-content-loader/native";
-import { AsyncStorage, FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  AsyncStorage,
+  FlatList,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  View
+} from "react-native";
 import {
   CacheManager,
   Image as CachedImage
@@ -189,15 +196,36 @@ const PostListScreen = props => {
   const url = `https://omladinskenovine.rs/wp-json/wp/v2/posts?${query}`;
   const [posts, setPosts] = useState(null);
   const [categories, setCategories] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleOnPress = (post, categories) =>
     navigation.push("Post", { post, categories });
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+
+    await getAllCategoires().then(setCategories);
+    await fetchPostsWithImages(url).then(posts => {
+      setPosts(posts);
+      AsyncStorage.setItem(query, JSON.stringify(posts));
+      AsyncStorage.setItem("categories", JSON.stringify(categories));
+    });
+
+    setRefreshing(false);
+  };
+
   useEffect(() => {
     const getPosts = async () => {
-      getAllCategoires().then(setCategories);
-
       const cachedPosts = JSON.parse(await AsyncStorage.getItem(query));
+      const cachedCategories = JSON.parse(
+        await AsyncStorage.getItem("categories")
+      );
+
+      if (cachedCategories) {
+        setCategories(cachedCategories);
+      } else {
+        await getAllCategoires().then(setCategories);
+      }
 
       if (cachedPosts) {
         return setPosts(cachedPosts);
@@ -206,6 +234,7 @@ const PostListScreen = props => {
       fetchPostsWithImages(url).then(posts => {
         setPosts(posts);
         AsyncStorage.setItem(query, JSON.stringify(posts));
+        AsyncStorage.setItem("categories", JSON.stringify(categories));
       });
     };
 
@@ -244,6 +273,9 @@ const PostListScreen = props => {
           </Text>
         ) : (
           <FlatList
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             data={posts}
             keyExtractor={item => `${item.id}`}
             renderItem={({ item: post }) => (
