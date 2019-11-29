@@ -148,9 +148,9 @@ export default class HomeScreen extends Component {
   renderItem = ({ item, index }) => {
     const { navigation } = this.props;
 
-    let categories = this.state.categories.filter(cat =>
+    let categories = this.state.categories? this.state.categories.filter(cat =>
       item.categories.includes(cat.id)
-    );
+    ) : [];
     const onReadMorePress = ({ post, categories }) =>
       navigation.push("Post", { post, categories });
 
@@ -185,9 +185,9 @@ export default class HomeScreen extends Component {
     const stories = posts
       .filter(post => post.image_url)
       .map(post => {
-        const post_categories = categories.filter(category =>
+        const post_categories = categories? categories.filter(category =>
           post.categories.includes(category.id)
-        );
+        ) : []
 
         return ({
           id: `${post.id}-${Math.random()}`,

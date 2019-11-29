@@ -7,7 +7,8 @@ import {
   RefreshControl,
   StyleSheet,
   Text,
-  View
+  View, 
+  Platform
 } from "react-native";
 import {
   CacheManager,
@@ -169,17 +170,20 @@ const SkeletonWrapper = styled(View)`
 const SkeletonCard = () => (
   <SkeletonWrapper>
     <Overlay>
-      <ContentLoader
-        height={120}
-        width={240}
-        speed={1}
-        primaryColor="#f9f9f9"
-        secondaryColor="#dddbdb"
-      >
-        <Rect x="88" y="34" rx="3" ry="3" width="68" height="6" />
-        <Rect x="0" y="57" rx="3" ry="3" width="244" height="14" />
-        <Rect x="0" y="79" rx="3" ry="3" width="240" height="14" />
-      </ContentLoader>
+      {
+        Platform.OS == 'ios' && 
+          <ContentLoader
+            height={120}
+            width={240}
+            speed={1}
+            primaryColor="#f9f9f9"
+            secondaryColor="#dddbdb"
+          >
+            <Rect x="88" y="34" rx="3" ry="3" width="68" height="6" />
+            <Rect x="0" y="57" rx="3" ry="3" width="244" height="14" />
+            <Rect x="0" y="79" rx="3" ry="3" width="240" height="14" />
+          </ContentLoader>
+      }
     </Overlay>
   </SkeletonWrapper>
 );
@@ -259,6 +263,7 @@ const PostListScreen = props => {
         </View>
       </View>
     );
+    
   }
 
   return (
